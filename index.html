@@ -33,7 +33,11 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; overflow-x: hidden; }
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+}
 body {
   background: var(--bg); color: var(--ink);
   font-family: var(--sans); font-weight: 400;
@@ -189,11 +193,17 @@ body.loaded { opacity: 1; }
 
 /* === SECTIONS === */
 section {
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   position: relative;
   padding: 100px 96px;
   display: flex; flex-direction: column;
+  justify-content: center;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: hidden;
   contain: layout style paint;
 }
 
@@ -214,7 +224,6 @@ section {
 
 /* === SECTION 1 — HERO === */
 .hero {
-  justify-content: center;
   padding-top: 120px;
   position: relative;
 }
@@ -275,6 +284,7 @@ section {
   grid-template-columns: minmax(320px, 0.9fr) 1.1fr;
   gap: 80px;
   align-items: center;
+  align-content: center;
 }
 .era-marker {
   display: flex; flex-direction: column; gap: 16px;
@@ -336,7 +346,6 @@ section {
 
 /* === SECTION 3 — WAVES TIMELINE === */
 .waves {
-  justify-content: center;
   padding: 120px 96px;
   background: var(--bg-soft);
 }
@@ -427,6 +436,7 @@ section {
   grid-template-columns: 1fr 1fr;
   gap: 80px;
   align-items: center;
+  align-content: center;
 }
 .moment .moment-year {
   font-size: clamp(160px, 24vw, 420px);
@@ -479,7 +489,6 @@ section {
 .agentic {
   background: var(--ink);
   color: var(--bg);
-  justify-content: center;
 }
 .agentic-year {
   font-size: clamp(160px, 24vw, 400px);
@@ -542,9 +551,10 @@ section {
 
 /* === SECTION 5B — ARCHITECTURE FRAMEWORK === */
 .fw {
-  justify-content: center;
-  padding: 120px 96px;
+  padding: 60px 96px;
   background: var(--bg-soft);
+  overflow-y: auto;
+  justify-content: flex-start;
 }
 .fw-label {
   font-family: var(--mono); font-size: 11px;
@@ -699,7 +709,7 @@ section {
   letter-spacing: 1.4px; color: rgba(255, 255, 255, 0.5);
 }
 @media (max-width: 900px) {
-  .fw { padding: 100px 24px; }
+  .fw { padding: 40px 24px; }
   .uc-tiers { grid-template-columns: 1fr; }
   .uc-tier:nth-child(2) { border-left: none; border-right: none; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2); }
   .cost-cards { grid-template-columns: 1fr; }
@@ -713,7 +723,6 @@ section {
 
 /* === SECTION 6 — DEMOCRATIZATION === */
 .dem {
-  justify-content: center;
 }
 .dem-header {
   display: grid; grid-template-columns: auto 1fr; gap: 80px;
@@ -877,7 +886,6 @@ section {
 
 /* === SECTION 9 — DEEPER SHIFT === */
 .shift {
-  justify-content: center;
 }
 .shift-label {
   font-family: var(--mono); font-size: 11px;
@@ -946,7 +954,7 @@ section {
 
 /* === SECTION 10 — CLOSE === */
 .close-section {
-  justify-content: center; align-items: center; text-align: center;
+  align-items: center; text-align: center;
   background: var(--ink); color: var(--bg);
   position: relative;
   overflow: hidden;
@@ -1722,10 +1730,8 @@ section {
 /* === SHARED VIZ SECTION STYLES === */
 .viz-section {
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 120px 64px;
-  min-height: 100vh;
+  padding: 80px 64px;
 }
 .viz-inner { width: 100%; max-width: 1020px; }
 .viz-eyebrow {
@@ -1775,9 +1781,9 @@ section {
 
 /* === RESPONSIVE === */
 @media (max-width: 900px) {
-  .viz-section { padding: 80px 24px; }
+  .viz-section { padding: 40px 24px; }
   .scroll-pct { display: none; }
-  section { padding: 100px 24px; min-height: 100vh; min-height: 100dvh; }
+  section { padding: 60px 24px; }
   .brand-bar { padding: 16px 20px; }
   .rail { display: none; }
   .scroll-hint { left: 24px; }
