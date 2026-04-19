@@ -3043,10 +3043,19 @@ section {
             setTimeout(function() { p.classList.add('visible'); }, delay);
           });
           setTimeout(function() { document.getElementById('sfClickHint').classList.add('visible'); }, 800);
+          // Auto-start particle animation after 2s if not clicked
+          sfAutoTimer = setTimeout(function() {
+            if (!sfRunning) {
+              sfResizeCanvas(); sfConns=sfGetConns(); sfRunning=true;
+              document.getElementById('sfClickHint').classList.add('hidden');
+              sfAnimate();
+            }
+          }, 2000);
         }
       });
     }, { threshold: 0.3 });
     sfObs.observe(svg);
+    var sfAutoTimer = null;
 
     // Particle system
     var sfCanvas = document.getElementById('sfParticleCanvas');
@@ -3127,6 +3136,7 @@ section {
     }
     document.getElementById('sfSankeyWrap').addEventListener('click', function() {
       if (!sfRunning) {
+        if (sfAutoTimer) { clearTimeout(sfAutoTimer); sfAutoTimer = null; }
         sfResizeCanvas(); sfConns=sfGetConns(); sfRunning=true;
         document.getElementById('sfClickHint').classList.add('hidden');
         sfAnimate();
@@ -3307,18 +3317,24 @@ section {
             var hint = document.getElementById('hybClickHint');
             if (hint) hint.classList.add('visible');
           }, 800);
+          // Auto-start hybrid animation after 2s if not clicked
+          hybAutoTimer = setTimeout(function() {
+            if (!hybAnimated && nowPanel) nowPanel.click();
+          }, 2000);
         }
       });
     }, { threshold: 0.25 });
 
     var hybPanelsEl = document.getElementById('hybPanels');
     if (hybPanelsEl) hybIo.observe(hybPanelsEl);
+    var hybAutoTimer = null;
 
     /* Click animate: Now panel */
     var nowPanel = document.getElementById('hybNowPanel');
     if (nowPanel) {
       nowPanel.addEventListener('click', function () {
         if (hybAnimated) return;
+        if (hybAutoTimer) { clearTimeout(hybAutoTimer); hybAutoTimer = null; }
         hybAnimated = true;
 
         var hint = document.getElementById('hybClickHint');
