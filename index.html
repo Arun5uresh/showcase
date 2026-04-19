@@ -3319,7 +3319,7 @@ section {
           }, 800);
           // Auto-start hybrid animation after 2s if not clicked
           hybAutoTimer = setTimeout(function() {
-            if (!hybAnimated && nowPanel) nowPanel.click();
+            if (!hybAnimated) hybPlay();
           }, 2000);
         }
       });
@@ -3331,70 +3331,103 @@ section {
 
     /* Click animate: Now panel */
     var nowPanel = document.getElementById('hybNowPanel');
+    var hybLoopTimer = null;
+    var LOOP_PAUSE = 3000; // pause before resetting and replaying
+
+    function hybReset() {
+      var nFigs = document.querySelectorAll('#hybNowGrid .hyb-figure');
+      nFigs.forEach(function (fig) {
+        fig.classList.remove('hyb-lit', 'hyb-lit-expert', 'hyb-lit-manager', 'hyb-lit-operator', 'hyb-highlight');
+        fig.classList.add('hyb-ghost');
+      });
+      var nb1 = document.getElementById('hybNB1');
+      var nb2 = document.getElementById('hybNB2');
+      var nb3 = document.getElementById('hybNB3');
+      if (nb1) nb1.style.width = '0';
+      if (nb2) nb2.style.width = '0';
+      if (nb3) nb3.style.width = '0';
+      document.querySelectorAll('#hybNowLegend .hyb-legend-item').forEach(function (li) {
+        li.classList.remove('hyb-vis');
+      });
+      hybAnimated = false;
+    }
+
+    function hybPlay() {
+      if (hybAnimated) return;
+      hybAnimated = true;
+
+      var hint = document.getElementById('hybClickHint');
+      if (hint) { hint.classList.remove('visible'); hint.classList.add('hidden'); }
+
+      var nFigs = document.querySelectorAll('#hybNowGrid .hyb-figure');
+      var STAGGER = 65;
+      var PAUSE = 200;
+
+      var nb1 = document.getElementById('hybNB1');
+      var nb2 = document.getElementById('hybNB2');
+      var nb3 = document.getElementById('hybNB3');
+
+      var roles = [];
+      for (var k = 0; k < TOTAL; k++) {
+        if (k < 10) roles.push('expert');
+        else if (k < 20) roles.push('manager');
+        else roles.push('operator');
+      }
+
+      var delay = 0;
+      var expertBarTriggered = false;
+      var managerBarTriggered = false;
+      var operatorBarTriggered = false;
+
+      roles.forEach(function (role, idx) {
+        if (idx === 10) delay += PAUSE;
+        if (idx === 20) delay += PAUSE;
+
+        var d = delay;
+        setTimeout(function () {
+          var fig = nFigs[idx];
+          fig.classList.remove('hyb-ghost');
+          fig.classList.add('hyb-lit', 'hyb-lit-' + role);
+
+          if (role === 'expert' && !expertBarTriggered) {
+            expertBarTriggered = true;
+            nb1.style.width = nb1.getAttribute('data-w') + '%';
+          }
+          if (role === 'manager' && !managerBarTriggered) {
+            managerBarTriggered = true;
+            nb2.style.width = nb2.getAttribute('data-w') + '%';
+          }
+          if (role === 'operator' && !operatorBarTriggered) {
+            operatorBarTriggered = true;
+            nb3.style.width = nb3.getAttribute('data-w') + '%';
+          }
+        }, d);
+        delay += STAGGER;
+      });
+
+      var totalTime = delay + 300;
+      setTimeout(function () {
+        for (var p = 20; p < 30; p++) {
+          nFigs[p].classList.add('hyb-highlight');
+        }
+        document.querySelectorAll('#hybNowLegend .hyb-legend-item').forEach(function (li, i) {
+          setTimeout(function () { li.classList.add('hyb-vis'); }, i * 150);
+        });
+        // Loop: reset after pause, then replay
+        hybLoopTimer = setTimeout(function () {
+          hybReset();
+          setTimeout(hybPlay, 600);
+        }, LOOP_PAUSE);
+      }, totalTime);
+    }
+
     if (nowPanel) {
       nowPanel.addEventListener('click', function () {
-        if (hybAnimated) return;
         if (hybAutoTimer) { clearTimeout(hybAutoTimer); hybAutoTimer = null; }
-        hybAnimated = true;
-
-        var hint = document.getElementById('hybClickHint');
-        if (hint) { hint.classList.remove('visible'); hint.classList.add('hidden'); }
-
-        var nFigs = document.querySelectorAll('#hybNowGrid .hyb-figure');
-        var STAGGER = 65;
-        var PAUSE = 200;
-
-        var nb1 = document.getElementById('hybNB1');
-        var nb2 = document.getElementById('hybNB2');
-        var nb3 = document.getElementById('hybNB3');
-
-        var roles = [];
-        for (var k = 0; k < TOTAL; k++) {
-          if (k < 10) roles.push('expert');
-          else if (k < 20) roles.push('manager');
-          else roles.push('operator');
+        if (hybLoopTimer) { clearTimeout(hybLoopTimer); hybLoopTimer = null; }
+        if (!hybAnimated) {
+          hybPlay();
         }
-
-        var delay = 0;
-        var expertBarTriggered = false;
-        var managerBarTriggered = false;
-        var operatorBarTriggered = false;
-
-        roles.forEach(function (role, idx) {
-          if (idx === 10) delay += PAUSE;
-          if (idx === 20) delay += PAUSE;
-
-          var d = delay;
-          setTimeout(function () {
-            var fig = nFigs[idx];
-            fig.classList.remove('hyb-ghost');
-            fig.classList.add('hyb-lit', 'hyb-lit-' + role);
-
-            if (role === 'expert' && !expertBarTriggered) {
-              expertBarTriggered = true;
-              nb1.style.width = nb1.getAttribute('data-w') + '%';
-            }
-            if (role === 'manager' && !managerBarTriggered) {
-              managerBarTriggered = true;
-              nb2.style.width = nb2.getAttribute('data-w') + '%';
-            }
-            if (role === 'operator' && !operatorBarTriggered) {
-              operatorBarTriggered = true;
-              nb3.style.width = nb3.getAttribute('data-w') + '%';
-            }
-          }, d);
-          delay += STAGGER;
-        });
-
-        var totalTime = delay + 300;
-        setTimeout(function () {
-          for (var p = 20; p < 30; p++) {
-            nFigs[p].classList.add('hyb-highlight');
-          }
-          document.querySelectorAll('#hybNowLegend .hyb-legend-item').forEach(function (li, i) {
-            setTimeout(function () { li.classList.add('hyb-vis'); }, i * 150);
-          });
-        }, totalTime);
       });
     }
   })();
