@@ -36,7 +36,6 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
-  scroll-snap-type: y mandatory;
 }
 body {
   background: var(--bg); color: var(--ink);
@@ -193,16 +192,12 @@ body.loaded { opacity: 1; }
 
 /* === SECTIONS === */
 section {
-  height: 100vh;
-  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   position: relative;
   padding: 100px 96px;
   display: flex; flex-direction: column;
   justify-content: center;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   overflow: hidden;
   contain: layout style paint;
 }
