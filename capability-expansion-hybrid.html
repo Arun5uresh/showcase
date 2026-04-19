@@ -126,32 +126,97 @@
     transform: translateY(0);
   }
   /* Before states */
-  .hyb-figure.hyb-ghost { opacity: 0.12; }
-  .hyb-figure.hyb-ghost.hyb-vis { opacity: 0.12; }
+  .hyb-figure.hyb-ghost { opacity: 0.18; }
+  .hyb-figure.hyb-ghost.hyb-vis { opacity: 0.18; }
+  .hyb-before .hyb-figure.hyb-ghost svg { fill: none; stroke: var(--ink-3); stroke-width: 0.6; stroke-dasharray: 2 2; }
   .hyb-figure.hyb-expert svg { fill: var(--ink); }
   .hyb-figure.hyb-expert.hyb-vis { opacity: 1; }
   .hyb-figure.hyb-manager svg { fill: var(--ink-3); }
-  .hyb-figure.hyb-manager.hyb-vis { opacity: 1; }
+  .hyb-figure.hyb-manager.hyb-vis { opacity: 0.7; }
+  .hyb-before .hyb-figure.hyb-manager svg { fill: none; stroke: var(--ink-3); stroke-width: 1; }
   /* Now ghost */
-  .hyb-now .hyb-figure.hyb-ghost svg { fill: var(--ink-3); }
-  /* Lit states */
-  .hyb-figure.hyb-lit svg { transition: fill 0.5s var(--ease-out); }
+  .hyb-now .hyb-figure.hyb-ghost svg { fill: rgba(0,0,0,0.15); }
+  /* Lit states — 3 clearly distinct fills on yellow */
+  .hyb-figure.hyb-lit svg { transition: fill 0.5s var(--ease-out), stroke 0.5s var(--ease-out); }
   .hyb-figure.hyb-lit.hyb-lit-expert svg { fill: var(--ink); }
-  .hyb-figure.hyb-lit.hyb-lit-manager svg { fill: var(--ink-1); }
-  .hyb-figure.hyb-lit.hyb-lit-operator svg { fill: var(--ink-1); }
+  .hyb-figure.hyb-lit.hyb-lit-manager svg { fill: #FFFFFF; stroke: var(--ink); stroke-width: 0.8; }
+  .hyb-figure.hyb-lit.hyb-lit-operator svg { fill: var(--ink); stroke: #FFFFFF; stroke-width: 1; }
   .hyb-figure.hyb-lit {
     opacity: 1 !important;
     transform: translateY(0) !important;
   }
   @keyframes hyb-pulse {
     0%   { filter: drop-shadow(0 0 0px transparent); }
-    50%  { filter: drop-shadow(0 0 8px rgba(0,0,0,0.5)); }
+    50%  { filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
     100% { filter: drop-shadow(0 0 0px transparent); }
   }
   .hyb-figure.hyb-highlight {
     animation: hyb-pulse 0.6s var(--ease-out) 2;
   }
-  .hyb-figure.hyb-highlight svg { fill: var(--ink) !important; }
+
+  /* ── Before compact grid (not 30 icons) ── */
+  .hyb-before .hyb-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  /* ── Locked-out summary block ── */
+  .hyb-locked-block {
+    margin: 8px 0 20px;
+    padding: 16px 20px;
+    border: 1px dashed var(--ink-3);
+    background: rgba(0,0,0,0.02);
+    text-align: center;
+  }
+  .hyb-locked-num {
+    font-family: var(--mono); font-size: 28px;
+    font-weight: 600; color: var(--ink-3);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .hyb-locked-label {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--ink-3); margin-top: 6px;
+    line-height: 1.4;
+  }
+  .hyb-locked-desc {
+    font-family: var(--sans); font-size: 13px;
+    color: var(--ink-3); margin-top: 8px;
+    line-height: 1.45;
+    font-style: italic;
+  }
+
+  /* ── Role group labels on grid ── */
+  .hyb-role-label {
+    grid-column: 1 / -1;
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    font-weight: 600;
+    padding: 6px 0 2px;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-out);
+  }
+  .hyb-role-label.hyb-vis { opacity: 1; }
+  .hyb-before .hyb-role-label { color: var(--ink-3); }
+  .hyb-before .hyb-role-label.hyb-rl-expert { color: var(--ink); }
+  .hyb-before .hyb-role-label.hyb-rl-manager { color: var(--ink-3); }
+  .hyb-before .hyb-role-label.hyb-rl-locked { color: var(--ink-3); opacity: 0.5; }
+  .hyb-now .hyb-role-label.hyb-rl-expert { color: var(--ink); }
+  .hyb-now .hyb-role-label.hyb-rl-manager { color: var(--ink-2); }
+  .hyb-now .hyb-role-label.hyb-rl-operator { color: var(--ink-1); }
+
+  /* ── Bar section divider ── */
+  .hyb-bar-heading {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--ink-3);
+    margin-top: 24px; margin-bottom: 12px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  .hyb-now .hyb-bar-heading { color: rgba(0,0,0,0.4); border-top-color: rgba(0,0,0,0.1); }
 
   /* ── Bar rows ── */
   .hyb-bars { margin-bottom: 0; }
@@ -183,10 +248,16 @@
     transition: width 1.2s var(--ease-out);
   }
   .hyb-before .hyb-bar-fill { background: var(--ink-3); }
-  .hyb-now .hyb-bar-fill { background: var(--ink); }
+  .hyb-before .hyb-bar-fill.hyb-bfill-expert { background: var(--ink); }
+  .hyb-before .hyb-bar-fill.hyb-bfill-manager { background: var(--ink-3); }
+  .hyb-before .hyb-bar-fill.hyb-bfill-operator { background: var(--ink-3); opacity: 0.4; }
+  .hyb-now .hyb-bar-fill.hyb-fill-expert { background: var(--ink); }
+  .hyb-now .hyb-bar-fill.hyb-fill-manager { background: #FFFFFF; border: 1px solid var(--ink); }
+  .hyb-now .hyb-bar-fill.hyb-fill-operator { background: var(--ink); }
   .hyb-bar-val {
-    font-family: var(--mono); font-size: 12px;
-    font-weight: 600; min-width: 36px; text-align: right;
+    font-family: var(--mono); font-size: 10px;
+    font-weight: 500; min-width: 100px; text-align: right;
+    letter-spacing: 0.5px;
   }
   .hyb-before .hyb-bar-val { color: var(--ink-3); }
   .hyb-now .hyb-bar-val { color: var(--ink); }
@@ -232,11 +303,11 @@
     width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0;
   }
   .hyb-legend-dot.hyb-d-expert { background: var(--ink); }
-  .hyb-legend-dot.hyb-d-manager { background: var(--ink-3); }
-  .hyb-legend-dot.hyb-d-ghost { background: var(--ink-3); opacity: 0.2; }
+  .hyb-legend-dot.hyb-d-manager { background: transparent; border: 1.5px solid var(--ink-3); }
+  .hyb-legend-dot.hyb-d-ghost { background: transparent; border: 1px dashed var(--ink-3); opacity: 0.5; }
   .hyb-now .hyb-legend-dot.hyb-d-expert { background: var(--ink); }
-  .hyb-now .hyb-legend-dot.hyb-d-manager { background: var(--ink-1); }
-  .hyb-now .hyb-legend-dot.hyb-d-operator { background: var(--ink); }
+  .hyb-now .hyb-legend-dot.hyb-d-manager { background: #FFFFFF; border: 1px solid var(--ink); }
+  .hyb-now .hyb-legend-dot.hyb-d-operator { background: var(--ink); border: 1px solid #FFFFFF; }
   .hyb-legend-name {
     font-family: var(--sans); font-size: 12px;
     font-weight: 500; color: var(--ink-1); letter-spacing: -0.01em;
@@ -312,21 +383,27 @@
       <div class="hyb-tag">Before</div>
       <div class="hyb-era">Pre-2020</div>
       <div class="hyb-grid" id="hybBeforeGrid"></div>
+      <div class="hyb-locked-block" id="hybLockedBlock">
+        <div class="hyb-locked-num">22</div>
+        <div class="hyb-locked-label">Everyone else</div>
+        <div class="hyb-locked-desc">Filed a request. Waited days. Got answers to questions they'd already moved past.</div>
+      </div>
+      <div class="hyb-bar-heading">Ability to use AI / analytics directly</div>
       <div class="hyb-bars">
         <div class="hyb-bar-row">
           <span class="hyb-bar-role">Experts</span>
-          <div class="hyb-bar-track"><div class="hyb-bar-fill" id="hybBB1" data-w="90"></div></div>
-          <span class="hyb-bar-val">High</span>
+          <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-bfill-expert" id="hybBB1" data-w="90"></div></div>
+          <span class="hyb-bar-val">Built &amp; ran models</span>
         </div>
         <div class="hyb-bar-row">
           <span class="hyb-bar-role">Managers</span>
-          <div class="hyb-bar-track"><div class="hyb-bar-fill" id="hybBB2" data-w="45"></div></div>
-          <span class="hyb-bar-val">Med</span>
+          <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-bfill-manager" id="hybBB2" data-w="45"></div></div>
+          <span class="hyb-bar-val">Requested reports</span>
         </div>
         <div class="hyb-bar-row">
           <span class="hyb-bar-role">Operators</span>
-          <div class="hyb-bar-track"><div class="hyb-bar-fill" id="hybBB3" data-w="15"></div></div>
-          <span class="hyb-bar-val">Low</span>
+          <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-bfill-operator" id="hybBB3" data-w="15"></div></div>
+          <span class="hyb-bar-val">Filed tickets</span>
         </div>
       </div>
       <div class="hyb-legend" id="hybBeforeLegend"></div>
@@ -340,21 +417,22 @@
       <div class="hyb-tag">Now</div>
       <div class="hyb-era">AI Era &mdash; 2024+</div>
       <div class="hyb-grid" id="hybNowGrid"></div>
+      <div class="hyb-bar-heading">Ability to use AI / analytics directly</div>
       <div class="hyb-bars">
         <div class="hyb-bar-row">
           <span class="hyb-bar-role">Experts</span>
-          <div class="hyb-bar-track"><div class="hyb-bar-fill" id="hybNB1" data-w="95"></div></div>
-          <span class="hyb-bar-val">High</span>
+          <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-fill-expert" id="hybNB1" data-w="95"></div></div>
+          <span class="hyb-bar-val">Build &amp; deploy</span>
         </div>
         <div class="hyb-bar-row">
           <span class="hyb-bar-role">Managers</span>
-          <div class="hyb-bar-track"><div class="hyb-bar-fill" id="hybNB2" data-w="85"></div></div>
-          <span class="hyb-bar-val">High</span>
+          <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-fill-manager" id="hybNB2" data-w="85"></div></div>
+          <span class="hyb-bar-val">Prompt &amp; decide</span>
         </div>
         <div class="hyb-bar-row">
           <span class="hyb-bar-role">Operators</span>
-          <div class="hyb-bar-track"><div class="hyb-bar-fill" id="hybNB3" data-w="70"></div></div>
-          <span class="hyb-bar-val">Med-High</span>
+          <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-fill-operator" id="hybNB3" data-w="70"></div></div>
+          <span class="hyb-bar-val">Automate &amp; act</span>
         </div>
       </div>
       <div class="hyb-legend" id="hybNowLegend"></div>
@@ -397,28 +475,65 @@
     }
   }
 
-  /* Before config: row 0 = 6 experts, row 1 col 0-1 = 2 managers, rest ghost */
-  var bCfg = [];
-  for (var i = 0; i < TOTAL; i++) {
-    var row = Math.floor(i / COLS);
-    var col = i % COLS;
-    if (row === 0) bCfg.push('hyb-expert');
-    else if (row === 1 && col < 2) bCfg.push('hyb-manager');
-    else bCfg.push('hyb-ghost');
+  function addRoleLabel(containerId, text, cssClass, beforeIndex) {
+    var c = document.getElementById(containerId);
+    var figs = c.querySelectorAll('.hyb-figure');
+    var label = document.createElement('div');
+    label.className = 'hyb-role-label ' + cssClass;
+    label.textContent = text;
+    label.setAttribute('data-group', cssClass);
+    if (figs[beforeIndex]) c.insertBefore(label, figs[beforeIndex]);
+    else c.appendChild(label);
   }
-  buildGrid('hybBeforeGrid', bCfg);
 
-  /* Now config: all ghost initially */
+  /* Before config: only 8 icons — 6 experts + 2 managers. No ghosts. */
+  var BEFORE_COUNT = 8;
+  var bCfg = [];
+  for (var i = 0; i < BEFORE_COUNT; i++) {
+    if (i < 6) bCfg.push('hyb-expert');
+    else bCfg.push('hyb-manager');
+  }
+  (function() {
+    var c = document.getElementById('hybBeforeGrid');
+    /* Expert label */
+    var el1 = document.createElement('div');
+    el1.className = 'hyb-role-label hyb-rl-expert hyb-vis';
+    el1.textContent = 'Experts \u2014 built models directly';
+    c.appendChild(el1);
+    for (var i = 0; i < 6; i++) {
+      var d = document.createElement('div');
+      d.className = 'hyb-figure hyb-expert';
+      d.innerHTML = ICON;
+      c.appendChild(d);
+    }
+    /* Manager label */
+    var el2 = document.createElement('div');
+    el2.className = 'hyb-role-label hyb-rl-manager hyb-vis';
+    el2.textContent = 'Managers \u2014 could request, not execute';
+    c.appendChild(el2);
+    for (var j = 0; j < 2; j++) {
+      var d = document.createElement('div');
+      d.className = 'hyb-figure hyb-manager';
+      d.innerHTML = ICON;
+      c.appendChild(d);
+    }
+  })();
+
+  /* Now config — 3 groups of 10, each with a role label */
+  /* Grid: 6 cols, so 10 icons = row of 6 + row of 4 (with 2 empty) */
   var nCfg = [];
   for (var j = 0; j < TOTAL; j++) nCfg.push('hyb-ghost');
   buildGrid('hybNowGrid', nCfg);
+  /* Insert role group labels before each group */
+  addRoleLabel('hybNowGrid', 'Experts \u2014 query, build, deploy', 'hyb-rl-expert', 0);
+  addRoleLabel('hybNowGrid', 'Managers \u2014 prompt, analyze, decide', 'hyb-rl-manager', 10);
+  addRoleLabel('hybNowGrid', 'Operators \u2014 automate, act, escalate', 'hyb-rl-operator', 20);
 
   /* ── Before legend ── */
   var bLeg = document.getElementById('hybBeforeLegend');
   [
-    { dot: 'hyb-d-expert', name: 'Experts', n: 6 },
-    { dot: 'hyb-d-manager', name: 'Managers', n: 2 },
-    { dot: 'hyb-d-ghost', name: 'Minimal access', n: 22 }
+    { dot: 'hyb-d-expert', name: 'Built models directly', n: 6 },
+    { dot: 'hyb-d-manager', name: 'Could request, not execute', n: 2 }
   ].forEach(function (item) {
     var el = document.createElement('div');
     el.className = 'hyb-legend-item hyb-vis';
@@ -430,9 +545,9 @@
   /* ── Now legend (hidden until animated) ── */
   var nLeg = document.getElementById('hybNowLegend');
   [
-    { dot: 'hyb-d-expert', name: 'Experts', n: 10 },
-    { dot: 'hyb-d-manager', name: 'Managers', n: 10 },
-    { dot: 'hyb-d-operator', name: 'Operators', n: 10 }
+    { dot: 'hyb-d-expert', name: 'Query, build, deploy directly', n: 10 },
+    { dot: 'hyb-d-manager', name: 'Prompt, analyze, decide', n: 10 },
+    { dot: 'hyb-d-operator', name: 'Automate, act, escalate', n: 10 }
   ].forEach(function (item) {
     var el = document.createElement('div');
     el.className = 'hyb-legend-item';
@@ -452,7 +567,7 @@
         /* Stagger Before grid icons */
         var bFigs = document.querySelectorAll('#hybBeforeGrid .hyb-figure');
         bFigs.forEach(function (fig, idx) {
-          setTimeout(function () { fig.classList.add('hyb-vis'); }, idx * 40);
+          setTimeout(function () { fig.classList.add('hyb-vis'); }, idx * 50);
         });
         /* Show Now ghost icons */
         var nFigs = document.querySelectorAll('#hybNowGrid .hyb-figure');

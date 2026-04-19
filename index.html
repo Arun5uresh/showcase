@@ -1216,91 +1216,305 @@ section {
   .sf-insight-cell.sf-ai svg { transform: rotate(90deg); }
 }
 
-/* === BEFORE-AFTER CHART (bac-) === */
-.bac-compare {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 0; border: 1px solid var(--ink);
+/* === CAPABILITY EXPANSION HYBRID (hyb-) === */
+.hyb-wrapper { width: 100%; max-width: 1020px; margin: 0 auto; }
+.hyb-eyebrow {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-1); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 14px;
 }
-.bac-panel { padding: 40px 36px 36px; position: relative; }
-.bac-panel.bac-before {
+.hyb-eyebrow::before {
+  content: ''; width: 24px; height: 8px; background: var(--accent);
+}
+.hyb-title {
+  font-family: var(--sans);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 300; letter-spacing: -0.025em;
+  line-height: 1.1; margin-bottom: 16px; color: var(--ink);
+}
+.hyb-title em {
+  font-style: italic; font-weight: 500; color: var(--ink);
+  background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+  padding: 0 6px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.hyb-subtitle {
+  font-size: 18px; line-height: 1.5;
+  color: var(--ink-2); font-weight: 300;
+  max-width: 48ch;
+  margin-bottom: 56px;
+}
+.hyb-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--ink);
+}
+.hyb-panel {
+  padding: 40px 36px 36px;
+  position: relative;
+}
+.hyb-panel.hyb-before {
   background: var(--bg);
   border-right: 1px solid var(--line-2);
 }
-.bac-panel.bac-now { background: var(--accent); }
-.bac-tag {
+.hyb-panel.hyb-now {
+  background: var(--accent);
+  cursor: pointer;
+}
+.hyb-tag {
   font-family: var(--mono); font-size: 11px;
   letter-spacing: 1.8px; text-transform: uppercase;
   font-weight: 600; margin-bottom: 12px;
   display: flex; align-items: center; gap: 12px;
 }
-.bac-tag::before { content: ''; width: 18px; height: 4px; }
-.bac-before .bac-tag { color: var(--ink-3); }
-.bac-before .bac-tag::before { background: var(--ink-3); }
-.bac-now .bac-tag { color: var(--ink); }
-.bac-now .bac-tag::before { background: var(--ink); }
-.bac-era {
+.hyb-tag::before { content: ''; width: 18px; height: 4px; }
+.hyb-before .hyb-tag { color: var(--ink-3); }
+.hyb-before .hyb-tag::before { background: var(--ink-3); }
+.hyb-now .hyb-tag { color: var(--ink); }
+.hyb-now .hyb-tag::before { background: var(--ink); }
+.hyb-era {
   font-family: var(--mono); font-size: 10px;
   letter-spacing: 1.4px; text-transform: uppercase;
-  margin-bottom: 36px;
+  margin-bottom: 28px;
 }
-.bac-before .bac-era { color: var(--ink-3); }
-.bac-now .bac-era { color: var(--ink-2); }
-.bac-bar-row {
-  display: grid; grid-template-columns: 100px 1fr auto;
-  gap: 16px; align-items: center;
-  padding: 16px 0; border-bottom: 1px solid var(--line);
+.hyb-before .hyb-era { color: var(--ink-3); }
+.hyb-now .hyb-era { color: var(--ink-2); }
+.hyb-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 28px;
 }
-.bac-bar-row:last-child { border-bottom: none; }
-.bac-now .bac-bar-row { border-bottom-color: rgba(0,0,0,0.1); }
-.bac-bar-role { font-size: 14px; font-weight: 500; letter-spacing: -0.01em; }
-.bac-before .bac-bar-role { color: var(--ink-2); }
-.bac-now .bac-bar-role { color: var(--ink); }
-.bac-bar-track {
-  height: 32px; background: rgba(0,0,0,0.06);
-  position: relative; overflow: hidden;
+.hyb-figure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
 }
-.bac-bar-fill {
+.hyb-figure.hyb-vis {
+  transform: translateY(0);
+}
+.hyb-figure.hyb-ghost { opacity: 0.18; }
+.hyb-figure.hyb-ghost.hyb-vis { opacity: 0.18; }
+.hyb-before .hyb-figure.hyb-ghost svg { fill: none; stroke: var(--ink-3); stroke-width: 0.6; stroke-dasharray: 2 2; }
+.hyb-figure.hyb-expert svg { fill: var(--ink); }
+.hyb-figure.hyb-expert.hyb-vis { opacity: 1; }
+.hyb-figure.hyb-manager svg { fill: var(--ink-3); }
+.hyb-figure.hyb-manager.hyb-vis { opacity: 0.7; }
+.hyb-before .hyb-figure.hyb-manager svg { fill: none; stroke: var(--ink-3); stroke-width: 1; }
+.hyb-now .hyb-figure.hyb-ghost svg { fill: rgba(0,0,0,0.15); }
+.hyb-figure.hyb-lit svg { transition: fill 0.5s var(--ease-out), stroke 0.5s var(--ease-out); }
+.hyb-figure.hyb-lit.hyb-lit-expert svg { fill: var(--ink); }
+.hyb-figure.hyb-lit.hyb-lit-manager svg { fill: #FFFFFF; stroke: var(--ink); stroke-width: 0.8; }
+.hyb-figure.hyb-lit.hyb-lit-operator svg { fill: var(--ink); stroke: #FFFFFF; stroke-width: 1; }
+.hyb-figure.hyb-lit {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+@keyframes hyb-pulse {
+  0%   { filter: drop-shadow(0 0 0px transparent); }
+  50%  { filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
+  100% { filter: drop-shadow(0 0 0px transparent); }
+}
+.hyb-figure.hyb-highlight {
+  animation: hyb-pulse 0.6s var(--ease-out) 2;
+}
+.hyb-before .hyb-grid {
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.hyb-locked-block {
+  margin: 8px 0 20px;
+  padding: 16px 20px;
+  border: 1px dashed var(--ink-3);
+  background: rgba(0,0,0,0.02);
+  text-align: center;
+}
+.hyb-locked-num {
+  font-family: var(--mono); font-size: 28px;
+  font-weight: 600; color: var(--ink-3);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.hyb-locked-label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--ink-3); margin-top: 6px;
+  line-height: 1.4;
+}
+.hyb-locked-desc {
+  font-family: var(--sans); font-size: 13px;
+  color: var(--ink-3); margin-top: 8px;
+  line-height: 1.45;
+  font-style: italic;
+}
+.hyb-role-label {
+  grid-column: 1 / -1;
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  font-weight: 600;
+  padding: 6px 0 2px;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+}
+.hyb-role-label.hyb-vis { opacity: 1; }
+.hyb-before .hyb-role-label { color: var(--ink-3); }
+.hyb-before .hyb-role-label.hyb-rl-expert { color: var(--ink); }
+.hyb-before .hyb-role-label.hyb-rl-manager { color: var(--ink-3); }
+.hyb-before .hyb-role-label.hyb-rl-locked { color: var(--ink-3); opacity: 0.5; }
+.hyb-now .hyb-role-label.hyb-rl-expert { color: var(--ink); }
+.hyb-now .hyb-role-label.hyb-rl-manager { color: var(--ink-2); }
+.hyb-now .hyb-role-label.hyb-rl-operator { color: var(--ink-1); }
+.hyb-bar-heading {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 24px; margin-bottom: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+}
+.hyb-now .hyb-bar-heading { color: rgba(0,0,0,0.4); border-top-color: rgba(0,0,0,0.1); }
+.hyb-bars { margin-bottom: 0; }
+.hyb-bar-row {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.hyb-bar-row:first-child { border-top: none; }
+.hyb-now .hyb-bar-row { border-top-color: rgba(0,0,0,0.1); }
+.hyb-bar-role {
+  font-size: 13px; font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.hyb-before .hyb-bar-role { color: var(--ink-2); }
+.hyb-now .hyb-bar-role { color: var(--ink); }
+.hyb-bar-track {
+  height: 24px;
+  background: rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+}
+.hyb-bar-fill {
   position: absolute; left: 0; top: 0; bottom: 0;
+  width: 0;
   transition: width 1.2s var(--ease-out);
 }
-.bac-before .bac-bar-fill { background: var(--ink-3); }
-.bac-now .bac-bar-fill { background: var(--ink); }
-.bac-bar-val {
-  font-family: var(--mono); font-size: 13px;
-  font-weight: 600; min-width: 72px; text-align: right;
+.hyb-before .hyb-bar-fill { background: var(--ink-3); }
+.hyb-before .hyb-bar-fill.hyb-bfill-expert { background: var(--ink); }
+.hyb-before .hyb-bar-fill.hyb-bfill-manager { background: var(--ink-3); }
+.hyb-before .hyb-bar-fill.hyb-bfill-operator { background: var(--ink-3); opacity: 0.4; }
+.hyb-now .hyb-bar-fill.hyb-fill-expert { background: var(--ink); }
+.hyb-now .hyb-bar-fill.hyb-fill-manager { background: #FFFFFF; border: 1px solid var(--ink); }
+.hyb-now .hyb-bar-fill.hyb-fill-operator { background: var(--ink); }
+.hyb-bar-val {
+  font-family: var(--mono); font-size: 10px;
+  font-weight: 500; min-width: 100px; text-align: right;
+  letter-spacing: 0.5px;
 }
-.bac-before .bac-bar-val { color: var(--ink-3); }
-.bac-now .bac-bar-val { color: var(--ink); }
-.bac-arrow-bridge {
+.hyb-before .hyb-bar-val { color: var(--ink-3); }
+.hyb-now .hyb-bar-val { color: var(--ink); }
+.hyb-arrow-bridge {
   position: absolute;
   right: -24px; top: 50%; transform: translateY(-50%);
-  z-index: 2; width: 48px; height: 48px;
-  background: var(--ink); border-radius: 50%;
+  z-index: 2;
+  width: 48px; height: 48px;
+  background: var(--ink);
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
 }
-.bac-arrow-bridge svg { width: 20px; height: 20px; }
-.bac-arrow-bridge path { stroke: var(--accent); stroke-width: 2; fill: none; }
-.bac-insight-row {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 0; border: 1px solid var(--ink); border-top: none;
+.hyb-arrow-bridge svg { width: 20px; height: 20px; }
+.hyb-arrow-bridge path { stroke: var(--accent); stroke-width: 2; fill: none; }
+.hyb-click-hint {
+  position: absolute;
+  bottom: 12px; right: 16px;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: rgba(0,0,0,0.4);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
 }
-.bac-insight-cell {
+.hyb-click-hint.visible { opacity: 1; }
+.hyb-click-hint.hidden { opacity: 0; }
+.hyb-legend {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  margin-top: 20px;
+}
+.hyb-legend-item {
+  display: flex; align-items: center; gap: 7px;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+}
+.hyb-legend-item.hyb-vis { opacity: 1; }
+.hyb-legend-dot {
+  width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0;
+}
+.hyb-legend-dot.hyb-d-expert { background: var(--ink); }
+.hyb-legend-dot.hyb-d-manager { background: transparent; border: 1.5px solid var(--ink-3); }
+.hyb-legend-dot.hyb-d-ghost { background: transparent; border: 1px dashed var(--ink-3); opacity: 0.5; }
+.hyb-now .hyb-legend-dot.hyb-d-expert { background: var(--ink); }
+.hyb-now .hyb-legend-dot.hyb-d-manager { background: #FFFFFF; border: 1px solid var(--ink); }
+.hyb-now .hyb-legend-dot.hyb-d-operator { background: var(--ink); border: 1px solid #FFFFFF; }
+.hyb-legend-name {
+  font-family: var(--sans); font-size: 12px;
+  font-weight: 500; color: var(--ink-1); letter-spacing: -0.01em;
+}
+.hyb-insight-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--ink);
+  border-top: none;
+}
+.hyb-insight-cell {
   padding: 20px 36px;
   font-family: var(--mono); font-size: 11px;
-  letter-spacing: 1px; text-transform: uppercase; text-align: center;
+  letter-spacing: 1px; text-transform: uppercase;
+  text-align: center;
 }
-.bac-insight-cell.bac-bi {
-  background: var(--bg); color: var(--ink-3);
+.hyb-insight-cell.hyb-bi {
+  background: var(--bg);
+  color: var(--ink-3);
   border-right: 1px solid var(--line-2);
 }
-.bac-insight-cell.bac-ni {
-  background: var(--ink); color: var(--accent); font-weight: 600;
+.hyb-insight-cell.hyb-ni {
+  background: var(--ink);
+  color: var(--accent);
+  font-weight: 600;
+}
+.hyb-caption {
+  margin-top: 48px; padding: 28px 32px;
+  background: var(--ink); color: var(--bg);
+  position: relative;
+  font-size: 20px; line-height: 1.4; font-weight: 400;
+}
+.hyb-caption::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 6px; background: var(--accent);
+}
+.hyb-caption em { color: var(--accent); font-weight: 500; font-style: normal; }
+.hyb-caption .hyb-source {
+  display: block; margin-top: 12px;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1.4px; color: rgba(255,255,255,0.5);
 }
 @media (max-width: 700px) {
-  .bac-compare { grid-template-columns: 1fr; }
-  .bac-panel.bac-before { border-right: none; border-bottom: 1px solid var(--line-2); }
-  .bac-arrow-bridge { display: none; }
-  .bac-insight-row { grid-template-columns: 1fr; }
+  .hyb-panels { grid-template-columns: 1fr; }
+  .hyb-panel.hyb-before { border-right: none; border-bottom: 1px solid var(--line-2); }
+  .hyb-arrow-bridge { display: none; }
+  .hyb-grid { grid-template-columns: repeat(5, 1fr); }
+  .hyb-panel { padding: 32px 24px; }
+  .hyb-bar-row { grid-template-columns: 80px 1fr auto; gap: 10px; }
+  .hyb-insight-row { grid-template-columns: 1fr; }
+  .hyb-insight-cell.hyb-bi { border-right: none; border-bottom: 1px solid var(--line-2); }
 }
 
 /* === CAPABILITIES TABLE (ct-) === */
@@ -2112,58 +2326,83 @@ section {
 
 <section class="viz-section" data-year="2026">
   <div class="viz-inner">
-    <div class="viz-eyebrow rv d1">Capability distribution</div>
-    <h2 class="viz-title rv d2">From Centralized Expertise to <em>Distributed Capability</em></h2>
-    <div class="bac-compare rv d3">
-      <div class="bac-panel bac-before">
-        <div class="bac-tag">Before</div>
-        <div class="bac-era">Pre-2020</div>
-        <div class="bac-bar-row">
-          <span class="bac-bar-role">Experts</span>
-          <div class="bac-bar-track"><div class="bac-bar-fill" style="width:90%"></div></div>
-          <span class="bac-bar-val">High</span>
+    <div class="hyb-wrapper">
+      <div class="hyb-eyebrow rv d1">Capability surface area</div>
+      <h1 class="hyb-title rv d2">Who Can Act Has <em>Expanded</em></h1>
+      <p class="hyb-subtitle rv d3">Capability didn't just improve. It spread.</p>
+
+      <div class="hyb-panels rv d4" id="hybPanels">
+        <!-- BEFORE panel -->
+        <div class="hyb-panel hyb-before">
+          <div class="hyb-tag">Before</div>
+          <div class="hyb-era">Pre-2020</div>
+          <div class="hyb-grid" id="hybBeforeGrid"></div>
+          <div class="hyb-locked-block" id="hybLockedBlock">
+            <div class="hyb-locked-num">22</div>
+            <div class="hyb-locked-label">Everyone else</div>
+            <div class="hyb-locked-desc">Filed a request. Waited days. Got answers to questions they'd already moved past.</div>
+          </div>
+          <div class="hyb-bar-heading">Ability to use AI / analytics directly</div>
+          <div class="hyb-bars">
+            <div class="hyb-bar-row">
+              <span class="hyb-bar-role">Experts</span>
+              <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-bfill-expert" id="hybBB1" data-w="90"></div></div>
+              <span class="hyb-bar-val">Built &amp; ran models</span>
+            </div>
+            <div class="hyb-bar-row">
+              <span class="hyb-bar-role">Managers</span>
+              <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-bfill-manager" id="hybBB2" data-w="45"></div></div>
+              <span class="hyb-bar-val">Requested reports</span>
+            </div>
+            <div class="hyb-bar-row">
+              <span class="hyb-bar-role">Operators</span>
+              <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-bfill-operator" id="hybBB3" data-w="15"></div></div>
+              <span class="hyb-bar-val">Filed tickets</span>
+            </div>
+          </div>
+          <div class="hyb-legend" id="hybBeforeLegend"></div>
+          <div class="hyb-arrow-bridge">
+            <svg viewBox="0 0 20 20"><path d="M 4 10 L 16 10 M 12 6 L 16 10 L 12 14"/></svg>
+          </div>
         </div>
-        <div class="bac-bar-row">
-          <span class="bac-bar-role">Managers</span>
-          <div class="bac-bar-track"><div class="bac-bar-fill" style="width:45%"></div></div>
-          <span class="bac-bar-val">Med</span>
-        </div>
-        <div class="bac-bar-row">
-          <span class="bac-bar-role">Operators</span>
-          <div class="bac-bar-track"><div class="bac-bar-fill" style="width:15%"></div></div>
-          <span class="bac-bar-val">Low</span>
-        </div>
-        <div class="bac-arrow-bridge">
-          <svg viewBox="0 0 20 20"><path d="M 4 10 L 16 10 M 12 6 L 16 10 L 12 14"/></svg>
+
+        <!-- NOW panel -->
+        <div class="hyb-panel hyb-now" id="hybNowPanel">
+          <div class="hyb-tag">Now</div>
+          <div class="hyb-era">AI Era &mdash; 2024+</div>
+          <div class="hyb-grid" id="hybNowGrid"></div>
+          <div class="hyb-bar-heading">Ability to use AI / analytics directly</div>
+          <div class="hyb-bars">
+            <div class="hyb-bar-row">
+              <span class="hyb-bar-role">Experts</span>
+              <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-fill-expert" id="hybNB1" data-w="95"></div></div>
+              <span class="hyb-bar-val">Build &amp; deploy</span>
+            </div>
+            <div class="hyb-bar-row">
+              <span class="hyb-bar-role">Managers</span>
+              <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-fill-manager" id="hybNB2" data-w="85"></div></div>
+              <span class="hyb-bar-val">Prompt &amp; decide</span>
+            </div>
+            <div class="hyb-bar-row">
+              <span class="hyb-bar-role">Operators</span>
+              <div class="hyb-bar-track"><div class="hyb-bar-fill hyb-fill-operator" id="hybNB3" data-w="70"></div></div>
+              <span class="hyb-bar-val">Automate &amp; act</span>
+            </div>
+          </div>
+          <div class="hyb-legend" id="hybNowLegend"></div>
+          <div class="hyb-click-hint" id="hybClickHint">Click to animate</div>
         </div>
       </div>
-      <div class="bac-panel bac-now">
-        <div class="bac-tag">Now</div>
-        <div class="bac-era">AI Era &mdash; 2024+</div>
-        <div class="bac-bar-row">
-          <span class="bac-bar-role">Experts</span>
-          <div class="bac-bar-track"><div class="bac-bar-fill" style="width:95%"></div></div>
-          <span class="bac-bar-val">High</span>
-        </div>
-        <div class="bac-bar-row">
-          <span class="bac-bar-role">Managers</span>
-          <div class="bac-bar-track"><div class="bac-bar-fill" style="width:85%"></div></div>
-          <span class="bac-bar-val">High</span>
-        </div>
-        <div class="bac-bar-row">
-          <span class="bac-bar-role">Operators</span>
-          <div class="bac-bar-track"><div class="bac-bar-fill" style="width:70%"></div></div>
-          <span class="bac-bar-val">Med-High</span>
-        </div>
+
+      <div class="hyb-insight-row">
+        <div class="hyb-insight-cell hyb-bi">Capability concentrated at the top</div>
+        <div class="hyb-insight-cell hyb-ni">Capability distributed across roles</div>
       </div>
-    </div>
-    <div class="bac-insight-row rv d4">
-      <div class="bac-insight-cell bac-bi">Capability concentrated at the top</div>
-      <div class="bac-insight-cell bac-ni">Capability distributed across roles</div>
-    </div>
-    <div class="viz-caption rv d5">
-      The shift isn't that experts got better. It's that <em>everyone else caught up</em>. AI compressed the capability gap between roles.
-      <span class="source">&mdash; Leadership &times; AI, Capability Distribution Analysis</span>
+
+      <div class="hyb-caption">
+        The shift isn't that experts got better. <em>It's that everyone else caught up.</em> AI compressed the capability gap between roles.
+        <span class="hyb-source">&mdash; Leadership &times; AI, Capability Expansion</span>
+      </div>
     </div>
   </div>
 </section>
@@ -2937,6 +3176,205 @@ section {
       });
     }, { threshold: 0.2 });
     ctObs.observe(ctBody);
+  })();
+
+  /* === CAPABILITY EXPANSION HYBRID (hyb-) === */
+  (function () {
+    var ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 34" width="24" height="36">' +
+      '<circle cx="10" cy="7" r="5.5"/>' +
+      '<path d="M3.5 16 C3.5 14.5 5 13.5 10 13.5 C15 13.5 16.5 14.5 16.5 16 L16.5 27 C16.5 29 15 31 10 31 C5 31 3.5 29 3.5 27 Z"/>' +
+      '</svg>';
+
+    var COLS = 6, ROWS = 5, TOTAL = 30;
+
+    function buildGrid(containerId, config) {
+      var c = document.getElementById(containerId);
+      if (!c) return;
+      for (var i = 0; i < TOTAL; i++) {
+        var d = document.createElement('div');
+        d.className = 'hyb-figure ' + (config[i] || 'hyb-ghost');
+        d.setAttribute('data-i', i);
+        d.innerHTML = ICON;
+        c.appendChild(d);
+      }
+    }
+
+    function addRoleLabel(containerId, text, cssClass, beforeIndex) {
+      var c = document.getElementById(containerId);
+      if (!c) return;
+      var figs = c.querySelectorAll('.hyb-figure');
+      var label = document.createElement('div');
+      label.className = 'hyb-role-label ' + cssClass;
+      label.textContent = text;
+      label.setAttribute('data-group', cssClass);
+      if (figs[beforeIndex]) c.insertBefore(label, figs[beforeIndex]);
+      else c.appendChild(label);
+    }
+
+    /* Before grid: 6 experts + 2 managers */
+    (function() {
+      var c = document.getElementById('hybBeforeGrid');
+      if (!c) return;
+      var el1 = document.createElement('div');
+      el1.className = 'hyb-role-label hyb-rl-expert hyb-vis';
+      el1.textContent = 'Experts \u2014 built models directly';
+      c.appendChild(el1);
+      for (var i = 0; i < 6; i++) {
+        var d = document.createElement('div');
+        d.className = 'hyb-figure hyb-expert';
+        d.innerHTML = ICON;
+        c.appendChild(d);
+      }
+      var el2 = document.createElement('div');
+      el2.className = 'hyb-role-label hyb-rl-manager hyb-vis';
+      el2.textContent = 'Managers \u2014 could request, not execute';
+      c.appendChild(el2);
+      for (var j = 0; j < 2; j++) {
+        var d = document.createElement('div');
+        d.className = 'hyb-figure hyb-manager';
+        d.innerHTML = ICON;
+        c.appendChild(d);
+      }
+    })();
+
+    /* Now grid: 30 ghosts, then role labels inserted */
+    var nCfg = [];
+    for (var j = 0; j < TOTAL; j++) nCfg.push('hyb-ghost');
+    buildGrid('hybNowGrid', nCfg);
+    addRoleLabel('hybNowGrid', 'Experts \u2014 query, build, deploy', 'hyb-rl-expert', 0);
+    addRoleLabel('hybNowGrid', 'Managers \u2014 prompt, analyze, decide', 'hyb-rl-manager', 10);
+    addRoleLabel('hybNowGrid', 'Operators \u2014 automate, act, escalate', 'hyb-rl-operator', 20);
+
+    /* Before legend */
+    var bLeg = document.getElementById('hybBeforeLegend');
+    if (bLeg) {
+      [
+        { dot: 'hyb-d-expert', name: 'Built models directly', n: 6 },
+        { dot: 'hyb-d-manager', name: 'Could request, not execute', n: 2 }
+      ].forEach(function (item) {
+        var el = document.createElement('div');
+        el.className = 'hyb-legend-item hyb-vis';
+        el.innerHTML = '<div class="hyb-legend-dot ' + item.dot + '"></div>' +
+          '<span class="hyb-legend-name">' + item.name + ' (' + item.n + ')</span>';
+        bLeg.appendChild(el);
+      });
+    }
+
+    /* Now legend (hidden until animated) */
+    var nLeg = document.getElementById('hybNowLegend');
+    if (nLeg) {
+      [
+        { dot: 'hyb-d-expert', name: 'Query, build, deploy directly', n: 10 },
+        { dot: 'hyb-d-manager', name: 'Prompt, analyze, decide', n: 10 },
+        { dot: 'hyb-d-operator', name: 'Automate, act, escalate', n: 10 }
+      ].forEach(function (item) {
+        var el = document.createElement('div');
+        el.className = 'hyb-legend-item';
+        el.innerHTML = '<div class="hyb-legend-dot ' + item.dot + '"></div>' +
+          '<span class="hyb-legend-name">' + item.name + ' (' + item.n + ')</span>';
+        nLeg.appendChild(el);
+      });
+    }
+
+    /* Scroll-reveal */
+    var hybRevealed = false;
+    var hybAnimated = false;
+
+    var hybIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && !hybRevealed) {
+          hybRevealed = true;
+          var bFigs = document.querySelectorAll('#hybBeforeGrid .hyb-figure');
+          bFigs.forEach(function (fig, idx) {
+            setTimeout(function () { fig.classList.add('hyb-vis'); }, idx * 50);
+          });
+          var nFigs = document.querySelectorAll('#hybNowGrid .hyb-figure');
+          nFigs.forEach(function (fig, idx) {
+            setTimeout(function () { fig.classList.add('hyb-vis'); }, idx * 25);
+          });
+          setTimeout(function () {
+            document.querySelectorAll('.hyb-before .hyb-bar-fill').forEach(function (bar) {
+              bar.style.width = bar.getAttribute('data-w') + '%';
+            });
+          }, 400);
+          setTimeout(function () {
+            var hint = document.getElementById('hybClickHint');
+            if (hint) hint.classList.add('visible');
+          }, 800);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    var hybPanelsEl = document.getElementById('hybPanels');
+    if (hybPanelsEl) hybIo.observe(hybPanelsEl);
+
+    /* Click animate: Now panel */
+    var nowPanel = document.getElementById('hybNowPanel');
+    if (nowPanel) {
+      nowPanel.addEventListener('click', function () {
+        if (hybAnimated) return;
+        hybAnimated = true;
+
+        var hint = document.getElementById('hybClickHint');
+        if (hint) { hint.classList.remove('visible'); hint.classList.add('hidden'); }
+
+        var nFigs = document.querySelectorAll('#hybNowGrid .hyb-figure');
+        var STAGGER = 65;
+        var PAUSE = 200;
+
+        var nb1 = document.getElementById('hybNB1');
+        var nb2 = document.getElementById('hybNB2');
+        var nb3 = document.getElementById('hybNB3');
+
+        var roles = [];
+        for (var k = 0; k < TOTAL; k++) {
+          if (k < 10) roles.push('expert');
+          else if (k < 20) roles.push('manager');
+          else roles.push('operator');
+        }
+
+        var delay = 0;
+        var expertBarTriggered = false;
+        var managerBarTriggered = false;
+        var operatorBarTriggered = false;
+
+        roles.forEach(function (role, idx) {
+          if (idx === 10) delay += PAUSE;
+          if (idx === 20) delay += PAUSE;
+
+          var d = delay;
+          setTimeout(function () {
+            var fig = nFigs[idx];
+            fig.classList.remove('hyb-ghost');
+            fig.classList.add('hyb-lit', 'hyb-lit-' + role);
+
+            if (role === 'expert' && !expertBarTriggered) {
+              expertBarTriggered = true;
+              nb1.style.width = nb1.getAttribute('data-w') + '%';
+            }
+            if (role === 'manager' && !managerBarTriggered) {
+              managerBarTriggered = true;
+              nb2.style.width = nb2.getAttribute('data-w') + '%';
+            }
+            if (role === 'operator' && !operatorBarTriggered) {
+              operatorBarTriggered = true;
+              nb3.style.width = nb3.getAttribute('data-w') + '%';
+            }
+          }, d);
+          delay += STAGGER;
+        });
+
+        var totalTime = delay + 300;
+        setTimeout(function () {
+          for (var p = 20; p < 30; p++) {
+            nFigs[p].classList.add('hyb-highlight');
+          }
+          document.querySelectorAll('#hybNowLegend .hyb-legend-item').forEach(function (li, i) {
+            setTimeout(function () { li.classList.add('hyb-vis'); }, i * 150);
+          });
+        }, totalTime);
+      });
+    }
   })();
 
 })();
