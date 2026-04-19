@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Evolution of Decision-Making</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAF5;
+    --ink: #000000;
+    --ink-1: #1A1A1A;
+    --ink-2: #5A5A5A;
+    --ink-3: #B0B0B0;
+    --line: rgba(0, 0, 0, 0.08);
+    --line-2: rgba(0, 0, 0, 0.14);
+    --accent: #F5E003;
+    --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* === HEADER === */
+  .page-header {
+    padding: 80px 64px 60px;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ink-1); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .eyebrow::before {
+    content: ''; width: 24px; height: 8px; background: var(--accent);
+  }
+  .page-header h1 {
+    font-size: clamp(32px, 4.5vw, 56px);
+    font-weight: 300; letter-spacing: -0.025em;
+    line-height: 1.08; color: var(--ink);
+    max-width: 20ch;
+  }
+  .page-header h1 em {
+    font-style: italic; font-weight: 500; color: var(--ink);
+    background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+    padding: 0 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* === SCROLLYTELLING CONTAINER === */
+  .scrolly {
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* left sticky panel */
+  .scrolly-visual {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    overflow: hidden;
+  }
+
+  /* visual card — each step has one, only active is visible */
+  .vis-card {
+    position: absolute;
+    inset: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 40px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+    pointer-events: none;
+  }
+  .vis-card.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* visual themes */
+  .vis-card[data-theme="dark"] {
+    background: var(--ink); color: var(--bg);
+  }
+  .vis-card[data-theme="yellow"] {
+    background: var(--accent); color: var(--ink);
+  }
+  .vis-card[data-theme="light"] {
+    background: var(--bg-soft); color: var(--ink);
+    border: 1px solid var(--line-2);
+  }
+
+  .vis-year {
+    font-size: clamp(72px, 12vw, 140px);
+    font-weight: 200; letter-spacing: -0.04em;
+    line-height: 0.85;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 24px;
+  }
+  .vis-card[data-theme="dark"] .vis-year { color: var(--bg); }
+  .vis-card[data-theme="yellow"] .vis-year { color: var(--ink); }
+  .vis-card[data-theme="light"] .vis-year { color: var(--ink); }
+
+  .vis-label {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.8px; text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .vis-label::before { content: ''; width: 18px; height: 4px; }
+  .vis-card[data-theme="dark"] .vis-label { color: var(--accent); }
+  .vis-card[data-theme="dark"] .vis-label::before { background: var(--accent); }
+  .vis-card[data-theme="yellow"] .vis-label { color: var(--ink); }
+  .vis-card[data-theme="yellow"] .vis-label::before { background: var(--ink); }
+  .vis-card[data-theme="light"] .vis-label { color: var(--ink-2); }
+  .vis-card[data-theme="light"] .vis-label::before { background: var(--accent); }
+
+  .vis-stat {
+    font-size: 48px; font-weight: 600;
+    letter-spacing: -0.02em; line-height: 1;
+    margin-bottom: 8px;
+  }
+  .vis-stat-label {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+  }
+  .vis-card[data-theme="dark"] .vis-stat { color: var(--accent); }
+  .vis-card[data-theme="dark"] .vis-stat-label { color: rgba(255,255,255,0.5); }
+  .vis-card[data-theme="yellow"] .vis-stat { color: var(--ink); }
+  .vis-card[data-theme="yellow"] .vis-stat-label { color: var(--ink-2); }
+  .vis-card[data-theme="light"] .vis-stat { color: var(--ink); }
+  .vis-card[data-theme="light"] .vis-stat-label { color: var(--ink-3); }
+
+  /* mini bar row inside visual */
+  .vis-bars { width: 100%; max-width: 240px; margin-top: 24px; }
+  .vis-bar-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 10px;
+  }
+  .vis-bar-label {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1px; width: 72px; text-align: right;
+    flex-shrink: 0;
+  }
+  .vis-bar-track {
+    flex: 1; height: 8px; position: relative;
+    overflow: hidden;
+  }
+  .vis-card[data-theme="dark"] .vis-bar-track { background: rgba(255,255,255,0.1); }
+  .vis-card[data-theme="yellow"] .vis-bar-track { background: rgba(0,0,0,0.1); }
+  .vis-card[data-theme="light"] .vis-bar-track { background: var(--line); }
+
+  .vis-bar-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    transition: width 0.8s var(--ease-out);
+  }
+  .vis-card[data-theme="dark"] .vis-bar-fill { background: var(--accent); }
+  .vis-card[data-theme="yellow"] .vis-bar-fill { background: var(--ink); }
+  .vis-card[data-theme="light"] .vis-bar-fill { background: var(--ink); }
+
+  /* step progress dots */
+  .vis-dots {
+    position: absolute; bottom: 28px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 10px;
+  }
+  .vis-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--line-2);
+    transition: all 0.4s var(--ease-out);
+  }
+  .vis-dot.active {
+    background: var(--accent);
+    transform: scale(1.3);
+    box-shadow: 0 0 0 4px rgba(245, 224, 3, 0.25);
+  }
+
+  /* right scrollable panel */
+  .scrolly-steps {
+    padding: 20vh 64px;
+    border-left: 1px solid var(--line-2);
+  }
+
+  .step {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px 0;
+    opacity: 0.25;
+    transition: opacity 0.6s var(--ease-out);
+  }
+  .step.active { opacity: 1; }
+
+  .step-num {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.8px; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .step-num::before {
+    content: ''; width: 18px; height: 4px; background: var(--accent);
+  }
+  .step h2 {
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 400; letter-spacing: -0.02em;
+    line-height: 1.15; max-width: 24ch;
+    margin-bottom: 24px;
+  }
+  .step p {
+    font-size: 16px; line-height: 1.6;
+    color: var(--ink-1); max-width: 48ch;
+    margin-bottom: 16px;
+  }
+  .step-pull {
+    margin-top: 20px; padding: 20px 24px;
+    background: var(--ink); color: var(--bg);
+    font-size: 16px; line-height: 1.4;
+    position: relative; max-width: 44ch;
+  }
+  .step-pull::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px; background: var(--accent);
+  }
+  .step-pull em { color: var(--accent); font-weight: 500; font-style: normal; }
+
+  /* === FOOTER CAPTION === */
+  .page-caption {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 64px 80px;
+  }
+  .caption {
+    padding: 28px 32px;
+    background: var(--ink); color: var(--bg);
+    position: relative;
+    font-size: 20px; line-height: 1.4; font-weight: 400;
+  }
+  .caption::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 6px; background: var(--accent);
+  }
+  .caption em { color: var(--accent); font-weight: 500; font-style: normal; }
+  .caption .source {
+    display: block; margin-top: 12px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; color: rgba(255,255,255,0.5);
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 800px) {
+    .scrolly { grid-template-columns: 1fr; }
+    .scrolly-visual {
+      position: relative; height: 50vh;
+      border-bottom: 1px solid var(--line-2);
+    }
+    .scrolly-steps { padding: 40px 24px; border-left: none; }
+    .step { min-height: 60vh; }
+    .page-header { padding: 48px 24px 40px; }
+    .page-caption { padding: 0 24px 48px; }
+    .vis-year { font-size: 72px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="eyebrow">Scrollytelling narrative</div>
+  <h1>The Evolution of <em>Decision-Making</em></h1>
+</div>
+
+<div class="scrolly">
+
+  <!-- LEFT: Sticky visual panel -->
+  <div class="scrolly-visual" id="visualPanel">
+    <!-- Visuals are injected by JS -->
+    <div class="vis-dots" id="visDots"></div>
+  </div>
+
+  <!-- RIGHT: Scrollable steps -->
+  <div class="scrolly-steps" id="stepsPanel"></div>
+
+</div>
+
+<div class="page-caption">
+  <div class="caption">
+    Each era compressed the loop further. <em>The shift isn't speed alone — it's who gets to participate.</em>
+    <span class="source">&mdash; Leadership &times; AI, Decision Evolution</span>
+  </div>
+</div>
+
+<script>
+(function () {
+
+  /* ================================================================
+     DATA — edit this array to change content. Each object = one step.
+     renderVisual receives the step object and returns an HTML string.
+     ================================================================ */
+  var steps = [
+    {
+      num: 'Step 01',
+      title: 'The gatekeeping era',
+      body: 'For four decades, analytics lived behind specialists. If you wanted an insight, you filed a request. Handed it off. Waited days, sometimes weeks.',
+      pull: 'The bottleneck was never data. It was <em>access to capability</em>.',
+      visual: {
+        theme: 'light',
+        label: 'The old world',
+        year: '1970',
+        stat: '4\u20136 wks',
+        statLabel: 'Average time to insight',
+        bars: [
+          { label: 'Experts', width: 90 },
+          { label: 'Managers', width: 30 },
+          { label: 'Operators', width: 8 }
+        ]
+      }
+    },
+    {
+      num: 'Step 02',
+      title: 'Six waves of compression',
+      body: 'Descriptive, diagnostic, predictive, prescriptive, generative, agentic. Each wave compressed the distance between a question and an answer. But the last two are categorically different.',
+      pull: 'They no longer just describe or predict. <em>They generate, and they act.</em>',
+      visual: {
+        theme: 'dark',
+        label: 'Analytics evolution',
+        year: '2015',
+        stat: '6 waves',
+        statLabel: 'Each faster than the last',
+        bars: [
+          { label: 'Describe', width: 100 },
+          { label: 'Predict', width: 80 },
+          { label: 'Generate', width: 55 },
+          { label: 'Act', width: 30 }
+        ]
+      }
+    },
+    {
+      num: 'Step 03',
+      title: 'The interface became the sentence',
+      body: 'When ChatGPT launched, a non-specialist could directly instruct AI in plain language and get a useful result back. Within eighteen months, the same pattern was embedded in every tool knowledge workers already used.',
+      pull: null,
+      visual: {
+        theme: 'yellow',
+        label: 'November 2022',
+        year: '2022',
+        stat: '100M',
+        statLabel: 'Users in two months',
+        bars: null
+      }
+    },
+    {
+      num: 'Step 04',
+      title: 'Systems that act, not just analyze',
+      body: 'Agents book the travel, draft the pull request, run the test suite, escalate the ticket. The question shifted from "can they?" to "where should they?"',
+      pull: 'Power doesn\u2019t mean using agents <em>everywhere</em>. It means knowing <em>where</em>.',
+      visual: {
+        theme: 'dark',
+        label: '2024 \u2014 Agentic',
+        year: '2024',
+        stat: '60 / 30 / 10',
+        statLabel: 'Deterministic \u00b7 Workflow \u00b7 Agent',
+        bars: [
+          { label: 'API', width: 60 },
+          { label: 'Workflow', width: 30 },
+          { label: 'Agent', width: 10 }
+        ]
+      }
+    },
+    {
+      num: 'Step 05',
+      title: 'From consumers to designers',
+      body: 'Leaders are moving from consumers of outputs to designers of outcomes. With agentic AI, they can now configure systems that don\u2019t just inform decisions \u2014 but execute parts of them.',
+      pull: 'Earlier, leaders asked for insights. Now they generate, validate, and act on them \u2014 <em>in the same loop</em>.',
+      visual: {
+        theme: 'yellow',
+        label: '2026 \u2014 Now',
+        year: '2026',
+        stat: 'Minutes',
+        statLabel: 'Average time to insight',
+        bars: [
+          { label: 'Experts', width: 95 },
+          { label: 'Managers', width: 85 },
+          { label: 'Operators', width: 70 }
+        ]
+      }
+    }
+  ];
+
+  /* ================================================================
+     RENDER VISUAL — returns HTML string for the left panel card.
+     Customise this function to change what the visual looks like.
+     ================================================================ */
+  function renderVisual(v, index) {
+    var html = '<div class="vis-card" data-theme="' + v.theme + '" data-index="' + index + '">';
+    html += '<div class="vis-label">' + v.label + '</div>';
+    html += '<div class="vis-year">' + v.year + '</div>';
+    html += '<div class="vis-stat">' + v.stat + '</div>';
+    html += '<div class="vis-stat-label">' + v.statLabel + '</div>';
+    if (v.bars) {
+      html += '<div class="vis-bars">';
+      v.bars.forEach(function (b) {
+        html += '<div class="vis-bar-row">';
+        html += '<span class="vis-bar-label">' + b.label + '</span>';
+        html += '<div class="vis-bar-track"><div class="vis-bar-fill" style="width:' + b.width + '%"></div></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  /* ================================================================
+     BUILD DOM
+     ================================================================ */
+  var visualPanel = document.getElementById('visualPanel');
+  var stepsPanel = document.getElementById('stepsPanel');
+  var dotsContainer = document.getElementById('visDots');
+
+  // inject visuals
+  steps.forEach(function (s, i) {
+    visualPanel.insertAdjacentHTML('afterbegin', renderVisual(s.visual, i));
+  });
+
+  // inject step dots
+  steps.forEach(function (_, i) {
+    var dot = document.createElement('div');
+    dot.className = 'vis-dot';
+    dot.dataset.index = i;
+    dotsContainer.appendChild(dot);
+  });
+
+  // inject steps
+  steps.forEach(function (s, i) {
+    var el = document.createElement('div');
+    el.className = 'step';
+    el.dataset.index = i;
+    var html = '<div class="step-num">' + s.num + '</div>';
+    html += '<h2>' + s.title + '</h2>';
+    html += '<p>' + s.body + '</p>';
+    if (s.pull) {
+      html += '<div class="step-pull">' + s.pull + '</div>';
+    }
+    el.innerHTML = html;
+    stepsPanel.appendChild(el);
+  });
+
+  /* ================================================================
+     INTERSECTION OBSERVER — detect active step
+     ================================================================ */
+  var visCards = document.querySelectorAll('.vis-card');
+  var dots = document.querySelectorAll('.vis-dot');
+  var stepEls = document.querySelectorAll('.step');
+  var currentIndex = -1;
+
+  function activate(index) {
+    if (index === currentIndex) return;
+    currentIndex = index;
+
+    visCards.forEach(function (c) {
+      c.classList.toggle('active', parseInt(c.dataset.index) === index);
+    });
+    dots.forEach(function (d) {
+      d.classList.toggle('active', parseInt(d.dataset.index) === index);
+    });
+    stepEls.forEach(function (s) {
+      s.classList.toggle('active', parseInt(s.dataset.index) === index);
+    });
+  }
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        activate(parseInt(entry.target.dataset.index));
+      }
+    });
+  }, {
+    rootMargin: '-40% 0px -40% 0px',
+    threshold: 0.1
+  });
+
+  stepEls.forEach(function (el) { observer.observe(el); });
+
+  // activate first step on load
+  activate(0);
+
+})();
+</script>
+</body>
+</html>

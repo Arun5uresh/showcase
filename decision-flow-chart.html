@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Collapse of the Decision Loop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAF5;
+    --ink: #000000;
+    --ink-1: #1A1A1A;
+    --ink-2: #5A5A5A;
+    --ink-3: #B0B0B0;
+    --line: rgba(0, 0, 0, 0.08);
+    --line-2: rgba(0, 0, 0, 0.14);
+    --accent: #F5E003;
+    --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+  .wrapper { width: 100%; max-width: 1020px; }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ink-1); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .eyebrow::before {
+    content: ''; width: 24px; height: 8px; background: var(--accent);
+  }
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 300; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 56px; color: var(--ink);
+  }
+  h1 em {
+    font-style: italic; font-weight: 500; color: var(--ink);
+    background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+    padding: 0 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* side-by-side panels */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+  }
+  .panel {
+    padding: 44px 40px 48px;
+    position: relative;
+  }
+  .panel.before {
+    background: var(--bg);
+    border-right: 1px solid var(--line-2);
+  }
+  .panel.now {
+    background: var(--accent);
+  }
+  .panel-tag {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.8px; text-transform: uppercase;
+    font-weight: 600; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .panel-tag::before {
+    content: ''; width: 18px; height: 4px;
+  }
+  .before .panel-tag { color: var(--ink-3); }
+  .before .panel-tag::before { background: var(--ink-3); }
+  .now .panel-tag { color: var(--ink); }
+  .now .panel-tag::before { background: var(--ink); }
+  .panel-era {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+  .before .panel-era { color: var(--ink-3); }
+  .now .panel-era { color: var(--ink-2); }
+
+  /* flow nodes */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .node {
+    width: 100%;
+    max-width: 280px;
+    padding: 18px 24px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    position: relative;
+  }
+  .before .node {
+    background: var(--bg);
+    border: 1px solid var(--line-2);
+    color: var(--ink-2);
+  }
+  .before .node.endpoint {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+  .now .flow-col .node {
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: var(--bg);
+    width: 100%;
+    max-width: none;
+  }
+  .now .flow-col .node.endpoint {
+    background: var(--bg);
+    border-color: var(--ink);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .now .flow-col .node.action-node {
+    background: var(--bg);
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* arrows between nodes */
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 0;
+    position: relative;
+  }
+  .arrow-line {
+    width: 1px;
+    height: 28px;
+  }
+  .before .arrow-line { background: var(--ink-3); }
+  .now .arrow-line { background: var(--ink); }
+  .arrow-head {
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+  }
+  .before .arrow-head { border-top: 6px solid var(--ink-3); }
+  .now .arrow-head { border-top: 6px solid var(--ink); }
+
+  /* time label beside each arrow */
+  .arrow-time {
+    position: absolute;
+    right: -70px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .before .arrow-time { color: var(--ink-3); }
+  .now .arrow-time { color: var(--ink-2); }
+
+  /* feedback loop (now panel) — SVG overlay */
+  .flow-with-loop {
+    display: grid;
+    grid-template-columns: 1fr 56px;
+    gap: 0;
+    align-items: stretch;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+  .flow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .loop-col {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+  }
+  .loop-col svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .loop-label {
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    white-space: nowrap;
+    transform-origin: center center;
+  }
+
+  /* step count badges */
+  .step-count {
+    margin-top: 32px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .before .step-count { color: var(--ink-3); }
+  .now .step-count { color: var(--ink); }
+  .step-count-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .before .step-count-label { color: var(--ink-3); }
+  .now .step-count-label { color: var(--ink-2); }
+
+  /* arrow bridge */
+  .arrow-bridge {
+    position: absolute;
+    right: -24px; top: 50%; transform: translateY(-50%);
+    z-index: 2;
+    width: 48px; height: 48px;
+    background: var(--ink);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .arrow-bridge svg {
+    width: 20px; height: 20px;
+  }
+  .arrow-bridge path {
+    stroke: var(--accent); stroke-width: 2; fill: none;
+  }
+
+  /* insight strip */
+  .insight-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+    border-top: none;
+  }
+  .insight-cell {
+    padding: 20px 36px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase;
+    text-align: center;
+  }
+  .insight-cell.before-i {
+    background: var(--bg);
+    color: var(--ink-3);
+    border-right: 1px solid var(--line-2);
+  }
+  .insight-cell.now-i {
+    background: var(--ink);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* caption */
+  .caption {
+    margin-top: 48px; padding: 28px 32px;
+    background: var(--ink); color: var(--bg);
+    position: relative;
+    font-size: 20px; line-height: 1.4; font-weight: 400;
+  }
+  .caption::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 6px; background: var(--accent);
+  }
+  .caption em {
+    color: var(--accent); font-weight: 500; font-style: normal;
+  }
+  .caption .source {
+    display: block; margin-top: 12px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; color: rgba(255,255,255,0.5);
+  }
+
+  @media (max-width: 700px) {
+    .compare { grid-template-columns: 1fr; }
+    .panel.before { border-right: none; border-bottom: 1px solid var(--line-2); }
+    .arrow-bridge { display: none; }
+    .insight-row { grid-template-columns: 1fr; }
+    .insight-cell.before-i { border-right: none; border-bottom: 1px solid var(--line-2); }
+    .arrow-time { display: none; }
+    .loop-col, .loop-label { display: none; }
+    .flow-with-loop { grid-template-columns: 1fr; max-width: 280px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="eyebrow">Decision architecture</div>
+  <h1>The Collapse of the <em>Decision Loop</em></h1>
+
+  <div class="compare">
+
+    <!-- BEFORE panel -->
+    <div class="panel before">
+      <div class="panel-tag">Before</div>
+      <div class="panel-era">Pre-2020</div>
+
+      <div class="flow">
+        <div class="node endpoint">Business</div>
+
+        <div class="arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-head"></div>
+          <span class="arrow-time">days</span>
+        </div>
+
+        <div class="node">Data Team</div>
+
+        <div class="arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-head"></div>
+          <span class="arrow-time">weeks</span>
+        </div>
+
+        <div class="node">Model</div>
+
+        <div class="arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-head"></div>
+          <span class="arrow-time">days</span>
+        </div>
+
+        <div class="node">Output</div>
+
+        <div class="arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-head"></div>
+          <span class="arrow-time">days</span>
+        </div>
+
+        <div class="node endpoint">Business</div>
+      </div>
+
+      <div class="step-count">5 steps</div>
+      <div class="step-count-label">Weeks to complete</div>
+
+      <div class="arrow-bridge">
+        <svg viewBox="0 0 20 20"><path d="M 4 10 L 16 10 M 12 6 L 16 10 L 12 14"/></svg>
+      </div>
+    </div>
+
+    <!-- NOW panel -->
+    <div class="panel now">
+      <div class="panel-tag">Now</div>
+      <div class="panel-era">AI Era &mdash; 2024+</div>
+
+      <div class="flow-with-loop">
+        <!-- Flow column -->
+        <div class="flow-col">
+          <div class="node endpoint">Business</div>
+
+          <div class="arrow">
+            <div class="arrow-line"></div>
+            <div class="arrow-head"></div>
+            <span class="arrow-time">minutes</span>
+          </div>
+
+          <div class="node">AI</div>
+
+          <div class="arrow">
+            <div class="arrow-line"></div>
+            <div class="arrow-head"></div>
+            <span class="arrow-time">minutes</span>
+          </div>
+
+          <div class="node action-node">Output &rarr; Action</div>
+        </div>
+
+        <!-- Loop column -->
+        <div class="loop-col">
+          <svg viewBox="0 0 56 100" preserveAspectRatio="none">
+            <!-- right vertical bar -->
+            <line x1="28" y1="8" x2="28" y2="92" stroke="#000" stroke-width="1" vector-effect="non-scaling-stroke" />
+            <!-- top hook -->
+            <line x1="0" y1="8" x2="28" y2="8" stroke="#000" stroke-width="1" vector-effect="non-scaling-stroke" />
+            <!-- bottom hook -->
+            <line x1="0" y1="92" x2="28" y2="92" stroke="#000" stroke-width="1" vector-effect="non-scaling-stroke" />
+            <!-- top arrowhead (pointing left, into Business) -->
+            <polygon points="0,4 8,8 0,12" fill="#000" vector-effect="non-scaling-stroke" />
+          </svg>
+          <span class="loop-label">Feedback loop</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 40px;">
+        <div class="step-count">3 steps</div>
+        <div class="step-count-label">Minutes to complete</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="insight-row">
+    <div class="insight-cell before-i">Sequential handoffs &middot; high latency &middot; stale by arrival</div>
+    <div class="insight-cell now-i">Direct loop &middot; real-time &middot; act on arrival</div>
+  </div>
+
+  <div class="caption">
+    The loop didn't just get faster. <em>It lost three steps.</em> The distance between a question and an action collapsed from weeks to minutes.
+    <span class="source">&mdash; Leadership &times; AI, Decision Architecture</span>
+  </div>
+</div>
+
+</body>
+</html>

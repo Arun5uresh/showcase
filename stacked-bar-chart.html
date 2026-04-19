@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Where Value Actually Comes From</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAF5;
+    --ink: #000000;
+    --ink-1: #1A1A1A;
+    --ink-2: #5A5A5A;
+    --ink-3: #B0B0B0;
+    --line: rgba(0, 0, 0, 0.08);
+    --accent: #F5E003;
+    --accent-soft: #FEFAC4;
+    --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+  .wrapper { width: 100%; max-width: 960px; }
+
+  /* eyebrow */
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ink-1); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .eyebrow::before {
+    content: ''; width: 24px; height: 8px; background: var(--accent);
+  }
+
+  /* title */
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 300; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 56px; color: var(--ink);
+  }
+  h1 em {
+    font-style: italic; font-weight: 500; color: var(--ink);
+    background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+    padding: 0 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* chart area */
+  .chart-frame {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    padding: 48px 40px 40px;
+  }
+
+  /* stacked bar — pure HTML/CSS for pixel-perfect control */
+  .bar-wrap { margin-bottom: 48px; }
+  .bar-track {
+    display: flex;
+    height: 72px;
+    border: 1px solid var(--ink);
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-seg {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+    transition: flex 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .bar-seg + .bar-seg { border-left: 1px solid var(--ink); }
+  .bar-pct {
+    font-family: var(--mono); font-size: 22px;
+    font-weight: 600; letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .bar-label {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    margin-top: 6px; opacity: 0.75;
+  }
+
+  .seg-det { flex: 60; background: var(--ink); color: var(--bg); }
+  .seg-wf  { flex: 30; background: var(--accent); color: var(--ink); }
+  .seg-ag  { flex: 10; background: var(--bg); color: var(--ink); }
+
+  /* legend row below bar */
+  .legend-row {
+    display: flex; gap: 0;
+    margin-top: 0;
+  }
+  .legend-cell {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+  }
+  .legend-cell:last-child { border-right: none; }
+  .legend-cell:first-child { flex: 60; }
+  .legend-cell:nth-child(2) { flex: 30; }
+  .legend-cell:nth-child(3) { flex: 10; min-width: 140px; }
+  .legend-head {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    font-weight: 600; margin-bottom: 8px;
+  }
+  .legend-cell:first-child .legend-head { color: var(--ink); }
+  .legend-cell:nth-child(2) .legend-head { color: var(--ink-1); }
+  .legend-cell:nth-child(3) .legend-head { color: var(--ink-2); }
+  .legend-desc {
+    font-size: 13px; line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  /* guidance strip */
+  .guidance {
+    display: flex; gap: 0;
+    border: 1px solid var(--ink);
+    border-top: 2px solid var(--ink);
+    margin-top: 48px;
+  }
+  .guidance-cell {
+    padding: 18px 24px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase;
+    text-align: center;
+    border-right: 1px solid var(--line);
+  }
+  .guidance-cell:last-child { border-right: none; }
+  .guidance-cell:first-child { flex: 60; background: var(--ink); color: var(--bg); font-weight: 600; }
+  .guidance-cell:nth-child(2) { flex: 30; background: var(--accent); color: var(--ink); font-weight: 600; }
+  .guidance-cell:nth-child(3) { flex: 10; min-width: 140px; background: var(--bg); color: var(--ink); font-weight: 600; }
+
+  /* caption */
+  .caption {
+    margin-top: 48px; padding: 28px 32px;
+    background: var(--ink); color: var(--bg);
+    position: relative;
+    font-size: 20px; line-height: 1.4; font-weight: 400;
+  }
+  .caption::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 6px; background: var(--accent);
+  }
+  .caption em {
+    color: var(--accent); font-weight: 500; font-style: normal;
+  }
+  .caption .source {
+    display: block; margin-top: 12px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; color: rgba(255,255,255,0.5);
+  }
+
+  /* responsive */
+  @media (max-width: 700px) {
+    .wrapper { max-width: 100%; }
+    .chart-frame { padding: 32px 20px 28px; }
+    .bar-track { height: 56px; }
+    .bar-pct { font-size: 16px; }
+    .bar-label { font-size: 9px; }
+    .legend-row { flex-direction: column; }
+    .legend-cell { border-right: none; border-bottom: 1px solid var(--line); }
+    .legend-cell:last-child { border-bottom: none; }
+    .guidance { flex-direction: column; }
+    .guidance-cell { border-right: none; border-bottom: 1px solid var(--line); }
+    .guidance-cell:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="eyebrow">AI system distribution</div>
+  <h1>Where Value <em>Actually</em> Comes From</h1>
+
+  <div class="chart-frame">
+
+    <!-- Stacked horizontal bar -->
+    <div class="bar-wrap">
+      <div class="bar-track">
+        <div class="bar-seg seg-det">
+          <span class="bar-pct">60%</span>
+          <span class="bar-label">Deterministic</span>
+        </div>
+        <div class="bar-seg seg-wf">
+          <span class="bar-pct">30%</span>
+          <span class="bar-label">Workflow</span>
+        </div>
+        <div class="bar-seg seg-ag">
+          <span class="bar-pct">10%</span>
+          <span class="bar-label">Agentic</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail legend -->
+    <div class="legend-row">
+      <div class="legend-cell">
+        <div class="legend-head">Deterministic (API-based)</div>
+        <div class="legend-desc">Simple API calls, CRUD operations, data transformations. High reliability, low cost, minimal debugging.</div>
+      </div>
+      <div class="legend-cell">
+        <div class="legend-head">Workflow + LLM</div>
+        <div class="legend-desc">Multi-step orchestrated pipelines with human-in-the-loop checkpoints.</div>
+      </div>
+      <div class="legend-cell">
+        <div class="legend-head">Agentic</div>
+        <div class="legend-desc">Autonomous, dynamic tool selection with self-correction.</div>
+      </div>
+    </div>
+
+    <!-- Guidance strip -->
+    <div class="guidance">
+      <div class="guidance-cell">Use for 60% of tasks</div>
+      <div class="guidance-cell">Use for 30%</div>
+      <div class="guidance-cell">Reserve for 10%</div>
+    </div>
+
+  </div>
+
+  <!-- Caption -->
+  <div class="caption">
+    Most value still comes from <em>simple systems.</em> The question isn't whether to use agents &mdash; it's whether a deterministic path already solves the problem.
+    <span class="source">&mdash; Leadership &times; AI, Architecture Decision Framework</span>
+  </div>
+</div>
+
+</body>
+</html>

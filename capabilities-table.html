@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>What Fluent Operation Looks Like</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAF5;
+    --ink: #000000;
+    --ink-1: #1A1A1A;
+    --ink-2: #5A5A5A;
+    --ink-3: #B0B0B0;
+    --line: rgba(0, 0, 0, 0.08);
+    --line-2: rgba(0, 0, 0, 0.14);
+    --accent: #F5E003;
+    --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+  .wrapper { width: 100%; max-width: 1020px; }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ink-1); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .eyebrow::before {
+    content: ''; width: 24px; height: 8px; background: var(--accent);
+  }
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 300; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 56px; color: var(--ink);
+  }
+  h1 em {
+    font-style: italic; font-weight: 500; color: var(--ink);
+    background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+    padding: 0 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* table */
+  .cap-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--ink);
+  }
+  .cap-table thead th {
+    padding: 18px 24px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    font-weight: 600; text-align: left;
+    border-bottom: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .cap-table thead th:first-child { color: var(--accent); }
+  .cap-table tbody tr {
+    transition: background 0.3s var(--ease-out);
+  }
+  .cap-table tbody tr:hover { background: rgba(245, 224, 3, 0.12); }
+  .cap-table tbody td {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line-2);
+    font-size: 14px; line-height: 1.5;
+    color: var(--ink-1);
+    vertical-align: top;
+  }
+  .cap-table tbody tr:last-child td { border-bottom: none; }
+
+  /* capability column */
+  .cap-cell {
+    display: flex; align-items: baseline; gap: 14px;
+    white-space: nowrap;
+  }
+  .cap-num {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.2px; color: var(--ink-3);
+    flex-shrink: 0;
+  }
+  .cap-name {
+    font-size: 18px; font-weight: 600;
+    letter-spacing: -0.01em; color: var(--ink);
+  }
+
+  /* description column */
+  .cap-desc {
+    color: var(--ink-2);
+  }
+
+  /* example column */
+  .cap-example {
+    color: var(--ink-1);
+    font-weight: 500;
+    position: relative;
+    padding-left: 16px;
+  }
+  .cap-example::before {
+    content: '';
+    position: absolute; left: 0; top: 4px; bottom: 4px;
+    width: 3px; background: var(--accent);
+  }
+
+  /* column widths */
+  .cap-table col.col-cap { width: 18%; }
+  .cap-table col.col-desc { width: 38%; }
+  .cap-table col.col-ex { width: 44%; }
+
+  /* caption */
+  .caption {
+    margin-top: 48px; padding: 28px 32px;
+    background: var(--ink); color: var(--bg);
+    position: relative;
+    font-size: 20px; line-height: 1.4; font-weight: 400;
+  }
+  .caption::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 6px; background: var(--accent);
+  }
+  .caption em {
+    color: var(--accent); font-weight: 500; font-style: normal;
+  }
+  .caption .source {
+    display: block; margin-top: 12px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; color: rgba(255,255,255,0.5);
+  }
+
+  /* responsive: stack rows on mobile */
+  @media (max-width: 700px) {
+    .cap-table, .cap-table thead, .cap-table tbody,
+    .cap-table th, .cap-table td, .cap-table tr {
+      display: block; width: 100%;
+    }
+    .cap-table thead { display: none; }
+    .cap-table tbody tr {
+      padding: 24px; margin-bottom: 0;
+      border-bottom: 1px solid var(--line-2);
+    }
+    .cap-table tbody tr:last-child { border-bottom: none; }
+    .cap-table tbody td {
+      padding: 4px 0; border-bottom: none;
+    }
+    .cap-table tbody td::before {
+      content: attr(data-label);
+      display: block;
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 1.4px; text-transform: uppercase;
+      color: var(--ink-3); margin-bottom: 4px;
+    }
+    .cap-table tbody td:first-child { padding-bottom: 12px; }
+    .cap-table tbody td:first-child::before { display: none; }
+    .cap-example { margin-top: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="eyebrow">Five capabilities</div>
+  <h1>What Fluent Operation <em>Looks Like</em></h1>
+
+  <table class="cap-table">
+    <colgroup>
+      <col class="col-cap">
+      <col class="col-desc">
+      <col class="col-ex">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Capability</th>
+        <th>Description</th>
+        <th>Real-World Example</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <div class="caption">
+    Fluency isn't technical depth. It's the ability to <em>frame, compose, and act</em> &mdash; directly, without routing through intermediaries.
+    <span class="source">&mdash; Leadership &times; AI, Capability Framework</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  var capabilities = [
+    {
+      num: '01',
+      name: 'Frame',
+      desc: 'Pose problems in a way AI systems can actually act on.',
+      example: 'Rewriting a vague strategy question as a structured prompt that returns actionable options with trade-offs.'
+    },
+    {
+      num: '02',
+      name: 'Assemble',
+      desc: 'Orchestrate workflows from existing tools \u2014 not code, compose.',
+      example: 'Piping daily supply chain exception alerts through a summarization model into a Teams channel \u2014 replacing the weekly manual review meeting.'
+    },
+    {
+      num: '03',
+      name: 'Extract',
+      desc: 'Pull insights directly from data, without routing through intermediaries.',
+      example: 'Querying a revenue dashboard with natural language and getting a chart with root-cause annotation in seconds.'
+    },
+    {
+      num: '04',
+      name: 'Identify',
+      desc: 'Spot where decisions can be automated or augmented \u2014 and where they shouldn\u2019t be.',
+      example: 'Recognizing that support ticket triage is a workflow task, not an agent task, saving 3\u00d7 on token costs.'
+    },
+    {
+      num: '05',
+      name: 'Scale',
+      desc: 'Spread capability across teams \u2014 as defaults, not as isolated pilots.',
+      example: 'Rolling an AI-assisted QA checklist into every team\u2019s sprint review, not just one pilot squad.'
+    }
+  ];
+
+  var tbody = document.getElementById('tableBody');
+
+  capabilities.forEach(function (cap) {
+    var tr = document.createElement('tr');
+
+    var tdCap = document.createElement('td');
+    tdCap.setAttribute('data-label', 'Capability');
+    tdCap.innerHTML = '<div class="cap-cell"><span class="cap-num">' + cap.num + '</span><span class="cap-name">' + cap.name + '</span></div>';
+
+    var tdDesc = document.createElement('td');
+    tdDesc.setAttribute('data-label', 'Description');
+    tdDesc.className = 'cap-desc';
+    tdDesc.textContent = cap.desc;
+
+    var tdEx = document.createElement('td');
+    tdEx.setAttribute('data-label', 'Real-world example');
+    tdEx.className = 'cap-example';
+    tdEx.textContent = cap.example;
+
+    tr.appendChild(tdCap);
+    tr.appendChild(tdDesc);
+    tr.appendChild(tdEx);
+    tbody.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>

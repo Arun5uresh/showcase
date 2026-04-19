@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>From Dependency Chains to Direct Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAF5;
+    --ink: #000000;
+    --ink-1: #1A1A1A;
+    --ink-2: #5A5A5A;
+    --ink-3: #B0B0B0;
+    --line: rgba(0, 0, 0, 0.08);
+    --line-2: rgba(0, 0, 0, 0.14);
+    --accent: #F5E003;
+    --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+  .wrapper { width: 100%; max-width: 1020px; }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ink-1); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .eyebrow::before {
+    content: ''; width: 24px; height: 8px; background: var(--accent);
+  }
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 300; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 16px; color: var(--ink);
+  }
+  h1 em {
+    font-style: italic; font-weight: 500; color: var(--ink);
+    background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+    padding: 0 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .subtitle {
+    font-size: 18px; line-height: 1.5;
+    color: var(--ink-2); font-weight: 300;
+    max-width: 48ch;
+    margin-bottom: 56px;
+  }
+
+  /* panels */
+  .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--line-2);
+  }
+  .panel {
+    padding: 48px 32px 56px;
+    position: relative;
+  }
+  .panel.before-panel {
+    background: var(--bg-soft);
+    border-right: 1px solid var(--line-2);
+  }
+  .panel.now-panel {
+    background: var(--bg);
+  }
+
+  .panel-label {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    font-weight: 600; margin-bottom: 40px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel-label::before { content: ''; width: 18px; height: 4px; }
+  .before-panel .panel-label { color: var(--ink-3); }
+  .before-panel .panel-label::before { background: var(--ink-3); }
+  .now-panel .panel-label { color: var(--ink); }
+  .now-panel .panel-label::before { background: var(--accent); }
+
+  .panel-sub {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--ink-3); margin-left: auto;
+  }
+  .now-panel .panel-sub { color: var(--ink-2); }
+
+  /* flow diagram via SVG */
+  .flow-svg {
+    width: 100%;
+    overflow: visible;
+  }
+
+  /* nodes */
+  .node-box {
+    transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+  }
+  .node-text {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .node-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* arrows */
+  .arrow-path {
+    stroke-width: 1.8;
+    fill: none;
+  }
+  .arrow-head {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .arrow-head.visible { opacity: 1; }
+
+  /* flowing dots */
+  .flow-dot {
+    opacity: 0;
+  }
+  .flow-dot.active {
+    opacity: 1;
+  }
+
+  /* return arrow label */
+  .return-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .return-label.visible { opacity: 1; }
+
+  /* caption */
+  .caption {
+    margin-top: 48px; padding: 28px 32px;
+    background: var(--ink); color: var(--bg);
+    position: relative;
+    font-size: 20px; line-height: 1.4; font-weight: 400;
+  }
+  .caption::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 6px; background: var(--accent);
+  }
+  .caption em { color: var(--accent); font-weight: 500; font-style: normal; }
+  .caption .source {
+    display: block; margin-top: 12px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; color: rgba(255,255,255,0.5);
+  }
+
+  @media (max-width: 700px) {
+    .panels { grid-template-columns: 1fr; }
+    .panel.before-panel { border-right: none; border-bottom: 1px solid var(--line-2); }
+    .panel { padding: 36px 20px 44px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="eyebrow">Workflow transformation</div>
+  <h1>From Dependency Chains to <em>Direct Access</em></h1>
+  <p class="subtitle">Everyone can now interact with capability directly.</p>
+
+  <div class="panels">
+
+    <!-- BEFORE panel -->
+    <div class="panel before-panel">
+      <div class="panel-label">Before <span class="panel-sub">Sequential</span></div>
+      <svg class="flow-svg" id="beforeSvg" viewBox="0 0 400 380" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+
+    <!-- NOW panel -->
+    <div class="panel now-panel">
+      <div class="panel-label">Now <span class="panel-sub">Parallel</span></div>
+      <svg class="flow-svg" id="nowSvg" viewBox="0 0 400 380" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+
+  </div>
+
+  <div class="caption">
+    Everyone can now interact with capability directly. <em>The chain collapsed into parallel lanes.</em>
+    <span class="source">&mdash; Leadership &times; AI, Workflow Transformation</span>
+  </div>
+</div>
+
+<script>
+(function () {
+
+  var NS = 'http://www.w3.org/2000/svg';
+
+  /* ── helpers ── */
+  function el(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  function drawRoundedRect(svg, x, y, w, h, fill, stroke, rx) {
+    var r = el('rect', {
+      x: x, y: y, width: w, height: h,
+      rx: rx || 6, ry: rx || 6,
+      fill: fill, stroke: stroke, 'stroke-width': 1.5
+    });
+    r.setAttribute('class', 'node-box');
+    svg.appendChild(r);
+    return r;
+  }
+
+  function drawText(svg, x, y, text, cls, fill, anchor) {
+    var t = el('text', {
+      x: x, y: y, fill: fill,
+      'text-anchor': anchor || 'middle',
+      'dominant-baseline': 'middle',
+      'class': cls
+    });
+    t.textContent = text;
+    svg.appendChild(t);
+    return t;
+  }
+
+  /* ── Arrow with draw animation + flowing dots ── */
+  var allArrows = [];
+
+  function createArrow(svg, d, color, delay, dotColor) {
+    var g = el('g', {});
+
+    // the path
+    var path = el('path', {
+      d: d,
+      stroke: color,
+      'class': 'arrow-path',
+      fill: 'none'
+    });
+    g.appendChild(path);
+
+    // we need the path in DOM to measure length
+    svg.appendChild(g);
+    var totalLen = path.getTotalLength();
+
+    // set up dash for draw-in
+    path.style.strokeDasharray = totalLen;
+    path.style.strokeDashoffset = totalLen;
+
+    // arrowhead at end point
+    var endPt = path.getPointAtLength(totalLen);
+    var nearEnd = path.getPointAtLength(Math.max(0, totalLen - 2));
+    var angle = Math.atan2(endPt.y - nearEnd.y, endPt.x - nearEnd.x);
+    var aLen = 7;
+    var head = el('polygon', {
+      points: [
+        endPt.x + ',' + endPt.y,
+        (endPt.x - aLen * Math.cos(angle - 0.4)) + ',' + (endPt.y - aLen * Math.sin(angle - 0.4)),
+        (endPt.x - aLen * Math.cos(angle + 0.4)) + ',' + (endPt.y - aLen * Math.sin(angle + 0.4))
+      ].join(' '),
+      fill: color,
+      'class': 'arrow-head'
+    });
+    g.appendChild(head);
+
+    // flowing dots (3 per arrow)
+    var dots = [];
+    for (var i = 0; i < 3; i++) {
+      var dot = el('circle', {
+        r: 1.75,
+        fill: dotColor || color,
+        'class': 'flow-dot'
+      });
+      g.appendChild(dot);
+      dots.push(dot);
+    }
+
+    allArrows.push({
+      path: path,
+      head: head,
+      dots: dots,
+      totalLen: totalLen,
+      delay: delay,
+      g: g
+    });
+
+    return g;
+  }
+
+  /* Straight line as SVG path */
+  function linePath(x1, y1, x2, y2) {
+    return 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2;
+  }
+
+  /* Quadratic curve as SVG path */
+  function curvePath(x1, y1, cx, cy, x2, y2) {
+    return 'M ' + x1 + ' ' + y1 + ' Q ' + cx + ' ' + cy + ' ' + x2 + ' ' + y2;
+  }
+
+  /* ══════════════════════════════
+     BEFORE: Linear chain
+     ══════════════════════════════ */
+
+  var bSvg = document.getElementById('beforeSvg');
+  var bW = 400;
+  var nodeW = 130, nodeH = 44;
+  var cx = bW / 2;
+
+  var bNodes = [
+    { label: 'Operator',  sub: 'requests',  y: 20,  fill: '#D4D4D4', stroke: '#B0B0B0', textFill: '#1A1A1A' },
+    { label: 'Manager',   sub: 'routes',    y: 105, fill: '#B0B0B0', stroke: '#8A8A8A', textFill: '#1A1A1A' },
+    { label: 'Expert',    sub: 'executes',  y: 190, fill: '#000000', stroke: '#000000', textFill: '#FFFFFF' },
+    { label: 'Output',    sub: 'delivered', y: 275, fill: '#FFFFFF', stroke: '#000000', textFill: '#000000' }
+  ];
+
+  bNodes.forEach(function (n) {
+    drawRoundedRect(bSvg, cx - nodeW / 2, n.y, nodeW, nodeH, n.fill, n.stroke, 6);
+    drawText(bSvg, cx, n.y + nodeH / 2 - 6, n.label, 'node-text', n.textFill);
+    drawText(bSvg, cx, n.y + nodeH / 2 + 9, n.sub, 'node-sub', n.textFill === '#FFFFFF' ? 'rgba(255,255,255,0.6)' : '#B0B0B0');
+  });
+
+  // down arrows
+  var gap = 17; // space between rect edge and arrow start/end
+  createArrow(bSvg, linePath(cx, bNodes[0].y + nodeH + 4, cx, bNodes[1].y - 4), '#B0B0B0', 0, '#8A8A8A');
+  createArrow(bSvg, linePath(cx, bNodes[1].y + nodeH + 4, cx, bNodes[2].y - 4), '#B0B0B0', 500, '#8A8A8A');
+  createArrow(bSvg, linePath(cx, bNodes[2].y + nodeH + 4, cx, bNodes[3].y - 4), '#B0B0B0', 1000, '#8A8A8A');
+
+  // return arrow: Output → Operator (curved left)
+  var retX = cx - nodeW / 2 - 36;
+  createArrow(bSvg,
+    curvePath(cx - nodeW / 2, bNodes[3].y + nodeH / 2, retX, (bNodes[3].y + bNodes[0].y + nodeH) / 2, cx - nodeW / 2, bNodes[0].y + nodeH / 2),
+    '#B0B0B0', 1600, '#8A8A8A'
+  );
+  var retLabel = drawText(bSvg, retX - 10, (bNodes[3].y + bNodes[0].y + nodeH) / 2, 'cycle', 'return-label', '#B0B0B0');
+
+  drawText(bSvg, cx, 352, '4 handoffs \u00b7 serial dependency', 'node-sub', '#B0B0B0');
+
+  /* ══════════════════════════════
+     NOW: Parallel direct access
+     ══════════════════════════════ */
+
+  var nSvg = document.getElementById('nowSvg');
+  var colRole = 60;
+  var colAI = 200;
+  var colOut = 340;
+  var laneGap = 90;
+  var nNodeW = 110, nNodeH = 40;
+
+  var roles = [
+    { label: 'Operator', y: 40,             fill: '#1A1A1A', stroke: '#1A1A1A', textFill: '#FFFFFF' },
+    { label: 'Manager',  y: 40 + laneGap,   fill: '#1A1A1A', stroke: '#1A1A1A', textFill: '#FFFFFF' },
+    { label: 'Expert',   y: 40 + laneGap*2,  fill: '#000000', stroke: '#000000', textFill: '#FFFFFF' }
+  ];
+
+  // AI node
+  var aiY = roles[0].y;
+  var aiH = roles[2].y + nNodeH - roles[0].y;
+  drawRoundedRect(nSvg, colAI - nNodeW / 2, aiY, nNodeW, aiH, '#F5E003', '#000000', 8);
+  drawText(nSvg, colAI, aiY + aiH / 2 - 8, 'AI Layer', 'node-text', '#000000');
+  drawText(nSvg, colAI, aiY + aiH / 2 + 9, 'processes all', 'node-sub', 'rgba(0,0,0,0.5)');
+
+  roles.forEach(function (r, i) {
+    // role node
+    drawRoundedRect(nSvg, colRole - nNodeW / 2, r.y, nNodeW, nNodeH, r.fill, r.stroke, 6);
+    drawText(nSvg, colRole, r.y + nNodeH / 2, r.label, 'node-text', r.textFill);
+
+    // output node
+    var outW = nNodeW - 20;
+    drawRoundedRect(nSvg, colOut - outW / 2, r.y, outW, nNodeH, '#FFFFFF', '#000000', 6);
+    drawText(nSvg, colOut, r.y + nNodeH / 2, 'Output', 'node-text', '#000000');
+
+    // arrow: role → AI
+    var roleRight = colRole + nNodeW / 2;
+    var aiLeft = colAI - nNodeW / 2;
+    createArrow(nSvg, linePath(roleRight + 4, r.y + nNodeH / 2, aiLeft - 4, r.y + nNodeH / 2), '#000000', i * 400, '#1A1A1A');
+
+    // arrow: AI → output
+    var aiRight = colAI + nNodeW / 2;
+    var outLeft = colOut - outW / 2;
+    createArrow(nSvg, linePath(aiRight + 4, r.y + nNodeH / 2, outLeft - 4, r.y + nNodeH / 2), '#F5E003', i * 400 + 700, '#F5E003');
+  });
+
+  drawText(nSvg, colAI, roles[2].y + nNodeH + 40, '1 handoff \u00b7 parallel access', 'node-sub', '#5A5A5A');
+
+  /* ══════════════════════════════
+     Animation system
+     ══════════════════════════════ */
+
+  var animStarted = false;
+  var dotAnimId = null;
+
+  function animateDrawIn() {
+    allArrows.forEach(function (a) {
+      // draw the path
+      setTimeout(function () {
+        a.path.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1)';
+        a.path.style.strokeDashoffset = '0';
+
+        // show arrowhead after line finishes drawing
+        setTimeout(function () {
+          a.head.classList.add('visible');
+        }, 1000);
+      }, a.delay);
+    });
+
+    // show return label
+    setTimeout(function () {
+      retLabel.classList.add('visible');
+    }, 2800);
+
+    // start flowing dots after all arrows drawn
+    setTimeout(startDotFlow, 2500);
+  }
+
+  /* Flowing dots – continuous loop */
+  var dotTime = 0;
+
+  function startDotFlow() {
+    allArrows.forEach(function (a) {
+      a.dots.forEach(function (d) { d.classList.add('active'); });
+    });
+    dotTime = 0;
+    tickDots();
+  }
+
+  function tickDots() {
+    dotTime += 0.0015;
+
+    allArrows.forEach(function (a) {
+      var len = a.totalLen;
+      a.dots.forEach(function (dot, i) {
+        // stagger each dot by 1/3 of the path
+        var t = (dotTime + i * 0.33) % 1;
+        var pt = a.path.getPointAtLength(t * len);
+        dot.setAttribute('cx', pt.x);
+        dot.setAttribute('cy', pt.y);
+        // fade in/out at ends
+        var alpha = 1;
+        if (t < 0.1) alpha = t / 0.1;
+        else if (t > 0.85) alpha = (1 - t) / 0.15;
+        dot.setAttribute('opacity', Math.max(0, Math.min(1, alpha)));
+      });
+    });
+
+    dotAnimId = requestAnimationFrame(tickDots);
+  }
+
+  /* ── trigger on scroll ── */
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting && !animStarted) {
+        animStarted = true;
+        animateDrawIn();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  observer.observe(document.querySelector('.panels'));
+
+})();
+</script>
+</body>
+</html>

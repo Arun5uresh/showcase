@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Capability Has Shifted from Concentrated to Distributed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAF5;
+    --ink: #000000;
+    --ink-1: #1A1A1A;
+    --ink-2: #5A5A5A;
+    --ink-3: #B0B0B0;
+    --line: rgba(0, 0, 0, 0.08);
+    --line-2: rgba(0, 0, 0, 0.14);
+    --accent: #F5E003;
+    --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+  .wrapper { width: 100%; max-width: 1020px; }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ink-1); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .eyebrow::before {
+    content: ''; width: 24px; height: 8px; background: var(--accent);
+  }
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 300; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 16px; color: var(--ink);
+  }
+  h1 em {
+    font-style: italic; font-weight: 500; color: var(--ink);
+    background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+    padding: 0 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .subtitle {
+    font-size: 18px; line-height: 1.5;
+    color: var(--ink-2); font-weight: 300;
+    max-width: 48ch;
+    margin-bottom: 56px;
+  }
+
+  /* diagram frame */
+  .diagram-frame {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    padding: 48px 40px;
+    position: relative;
+  }
+
+  /* era labels */
+  .era-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding: 0 40px;
+  }
+  .era-label {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.8px; text-transform: uppercase;
+    font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .era-label::before { content: ''; width: 18px; height: 4px; }
+  .era-label.before { color: var(--ink-3); }
+  .era-label.before::before { background: var(--ink-3); }
+  .era-label.now { color: var(--ink); }
+  .era-label.now::before { background: var(--accent); }
+  .era-sub {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .era-label.before .era-sub { color: var(--ink-3); }
+  .era-label.now .era-sub { color: var(--ink-2); }
+
+  /* SVG container */
+  .sankey-wrap {
+    position: relative;
+    width: 100%;
+    height: 360px;
+    cursor: pointer;
+  }
+  .sankey-wrap svg {
+    width: 100%;
+    height: 100%;
+  }
+  .sankey-wrap canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .click-hint {
+    position: absolute;
+    bottom: 12px; right: 16px;
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--ink-3);
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out);
+  }
+  .click-hint.visible { opacity: 1; }
+  .click-hint.hidden { opacity: 0; }
+
+  /* sankey flows */
+  .flow-path {
+    fill: none;
+    stroke-linecap: round;
+    opacity: 0;
+    transition: opacity 0.8s var(--ease-out);
+  }
+  .flow-path.visible { opacity: 1; }
+  .flow-path.primary { stroke: var(--ink); opacity: 0; }
+  .flow-path.primary.visible { opacity: 0.85; }
+  .flow-path.secondary { stroke: var(--accent); opacity: 0; }
+  .flow-path.secondary.visible { opacity: 0.7; }
+  .flow-path.tertiary { stroke: var(--accent); opacity: 0; }
+  .flow-path.tertiary.visible { opacity: 0.5; }
+
+  /* sankey nodes */
+  .node-rect {
+    transition: all 0.8s var(--ease-out);
+  }
+  .node-label {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .node-size {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* insight strip */
+  .insight-strip {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    border: 1px solid var(--ink);
+    border-top: none;
+    margin-top: 0;
+  }
+  .insight-cell {
+    padding: 20px 28px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase;
+    text-align: center;
+  }
+  .insight-cell.before-i {
+    background: var(--bg);
+    color: var(--ink-3);
+  }
+  .insight-cell.arrow-i {
+    background: var(--bg);
+    color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px;
+  }
+  .insight-cell.arrow-i svg { width: 32px; height: 16px; }
+  .insight-cell.arrow-i path { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+  .insight-cell.now-i {
+    background: var(--ink);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* caption */
+  .caption {
+    margin-top: 48px; padding: 28px 32px;
+    background: var(--ink); color: var(--bg);
+    position: relative;
+    font-size: 20px; line-height: 1.4; font-weight: 400;
+  }
+  .caption::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 6px; background: var(--accent);
+  }
+  .caption em { color: var(--accent); font-weight: 500; font-style: normal; }
+  .caption .source {
+    display: block; margin-top: 12px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; color: rgba(255,255,255,0.5);
+  }
+
+  @media (max-width: 700px) {
+    .diagram-frame { padding: 32px 16px; }
+    .era-labels { padding: 0 8px; }
+    .sankey-wrap { height: 300px; }
+    .insight-strip { grid-template-columns: 1fr; }
+    .insight-cell.arrow-i { padding: 8px; }
+    .insight-cell.arrow-i svg { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="eyebrow">Capability redistribution</div>
+  <h1>Capability Has Shifted from Concentrated to <em>Distributed</em></h1>
+  <p class="subtitle">Access is no longer vertical. It's horizontal.</p>
+
+  <div class="diagram-frame">
+    <div class="era-labels">
+      <div class="era-label before">
+        <div>Before<div class="era-sub">Centralized</div></div>
+      </div>
+      <div class="era-label now">
+        <div>Now<div class="era-sub">Distributed</div></div>
+      </div>
+    </div>
+
+    <div class="sankey-wrap" id="sankeyWrap">
+      <svg id="sankeySvg" viewBox="0 0 1060 340" preserveAspectRatio="xMidYMid meet"></svg>
+      <canvas id="particleCanvas"></canvas>
+      <div class="click-hint" id="clickHint">Click to animate flow</div>
+    </div>
+  </div>
+
+  <div class="insight-strip">
+    <div class="insight-cell before-i">One group held the keys</div>
+    <div class="insight-cell arrow-i">
+      <svg viewBox="0 0 32 16"><path d="M 0 8 L 28 8 M 22 3 L 28 8 L 22 13"/></svg>
+    </div>
+    <div class="insight-cell now-i">Everyone operates with fluency</div>
+  </div>
+
+  <div class="caption">
+    The shift isn't that experts got better. <em>It's that everyone else caught up.</em> AI compressed the capability gap between roles.
+    <span class="source">&mdash; Leadership &times; AI, Capability Redistribution</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  var svg = document.getElementById('sankeySvg');
+  var W = 1060, H = 340;
+  var nodeW = 20;
+  var leftX = 140;
+  var rightX = W - 140 - nodeW;
+
+  /* ── left nodes (Before) ── */
+  var leftNodes = [
+    { id: 'l-exp',  label: 'Experts',   size: 'high',    h: 160, y: 30,  color: '#000' },
+    { id: 'l-mgr',  label: 'Managers',  size: 'medium',  h: 56,  y: 215, color: '#B0B0B0' },
+    { id: 'l-ops',  label: 'Operators', size: 'low',     h: 28,  y: 296, color: '#D4D4D4' }
+  ];
+
+  /* ── right nodes (Now) ── */
+  var rightNodes = [
+    { id: 'r-exp',  label: 'Experts',   size: 'high',    h: 100, y: 20,  color: '#000' },
+    { id: 'r-mgr',  label: 'Managers',  size: 'high',    h: 100, y: 135, color: '#000' },
+    { id: 'r-ops',  label: 'Operators', size: 'med-high',h: 80,  y: 250, color: '#1A1A1A' }
+  ];
+
+  /* ── flows ── */
+  var flows = [
+    { from: leftNodes[0], to: rightNodes[0], thickness: 28, cls: 'primary',   delay: 0 },
+    { from: leftNodes[0], to: rightNodes[1], thickness: 22, cls: 'secondary', delay: 200 },
+    { from: leftNodes[0], to: rightNodes[2], thickness: 16, cls: 'tertiary',  delay: 400 },
+    { from: leftNodes[1], to: rightNodes[1], thickness: 8,  cls: 'secondary', delay: 500 },
+    { from: leftNodes[2], to: rightNodes[2], thickness: 6,  cls: 'tertiary',  delay: 600 }
+  ];
+
+  /* ── draw nodes ── */
+  function drawNode(n, x, align) {
+    var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+    var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', x);
+    rect.setAttribute('y', n.y);
+    rect.setAttribute('width', nodeW);
+    rect.setAttribute('height', n.h);
+    rect.setAttribute('fill', n.color);
+    rect.setAttribute('class', 'node-rect');
+    g.appendChild(rect);
+
+    // label
+    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('y', n.y + n.h / 2 + 1);
+    text.setAttribute('class', 'node-label');
+    text.setAttribute('fill', '#1A1A1A');
+    text.setAttribute('dominant-baseline', 'middle');
+    if (align === 'right') {
+      text.setAttribute('x', x + nodeW + 16);
+      text.setAttribute('text-anchor', 'start');
+    } else {
+      text.setAttribute('x', x - 16);
+      text.setAttribute('text-anchor', 'end');
+    }
+    text.textContent = n.label;
+    g.appendChild(text);
+
+    // size label
+    var sz = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    sz.setAttribute('y', n.y + n.h / 2 + 16);
+    sz.setAttribute('class', 'node-size');
+    sz.setAttribute('dominant-baseline', 'middle');
+    if (align === 'right') {
+      sz.setAttribute('x', x + nodeW + 16);
+      sz.setAttribute('text-anchor', 'start');
+      sz.setAttribute('fill', '#5A5A5A');
+    } else {
+      sz.setAttribute('x', x - 16);
+      sz.setAttribute('text-anchor', 'end');
+      sz.setAttribute('fill', '#B0B0B0');
+    }
+    sz.textContent = n.size;
+    g.appendChild(sz);
+
+    svg.appendChild(g);
+  }
+
+  leftNodes.forEach(function (n) { drawNode(n, leftX, 'left'); });
+  rightNodes.forEach(function (n) { drawNode(n, rightX, 'right'); });
+
+  /* ── draw flows (cubic bezier) ── */
+  function flowPath(from, fromX, to, toX, thickness) {
+    var y0 = from.y + from.h / 2;
+    var y1 = to.y + to.h / 2;
+    var cpX = (fromX + toX) / 2;
+
+    var halfT = thickness / 2;
+    // top edge
+    var d = 'M ' + fromX + ' ' + (y0 - halfT) +
+            ' C ' + cpX + ' ' + (y0 - halfT) + ', ' +
+                    cpX + ' ' + (y1 - halfT) + ', ' +
+                    toX + ' ' + (y1 - halfT) +
+            // bottom edge (reverse)
+            ' L ' + toX + ' ' + (y1 + halfT) +
+            ' C ' + cpX + ' ' + (y1 + halfT) + ', ' +
+                    cpX + ' ' + (y0 + halfT) + ', ' +
+                    fromX + ' ' + (y0 + halfT) +
+            ' Z';
+    return d;
+  }
+
+  flows.forEach(function (f) {
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', flowPath(f.from, leftX + nodeW, f.to, rightX, f.thickness));
+    path.setAttribute('class', 'flow-path ' + f.cls);
+
+    if (f.cls === 'primary') {
+      path.setAttribute('fill', 'rgba(0, 0, 0, 0.12)');
+      path.setAttribute('stroke', 'none');
+    } else if (f.cls === 'secondary') {
+      path.setAttribute('fill', 'rgba(245, 224, 3, 0.25)');
+      path.setAttribute('stroke', 'none');
+    } else {
+      path.setAttribute('fill', 'rgba(245, 224, 3, 0.15)');
+      path.setAttribute('stroke', 'none');
+    }
+
+    path.dataset.delay = f.delay;
+    svg.insertBefore(path, svg.firstChild); // behind nodes
+  });
+
+  /* ── animate in on viewport entry ── */
+  var animated = false;
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting && !animated) {
+        animated = true;
+        var paths = svg.querySelectorAll('.flow-path');
+        paths.forEach(function (p) {
+          var delay = parseInt(p.dataset.delay) || 0;
+          setTimeout(function () {
+            p.classList.add('visible');
+          }, delay);
+        });
+        // show click hint after flows appear
+        setTimeout(function () {
+          document.getElementById('clickHint').classList.add('visible');
+        }, 800);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  observer.observe(svg);
+
+  /* ══════════════════════════════════════════
+     Particle flow system — click to animate
+     ══════════════════════════════════════════ */
+
+  var canvas = document.getElementById('particleCanvas');
+  var ctxC = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var particles = [];
+  var particlesRunning = false;
+
+  function resizeCanvas() {
+    var wrap = document.getElementById('sankeyWrap');
+    canvas.width = wrap.offsetWidth * dpr;
+    canvas.height = wrap.offsetHeight * dpr;
+    canvas.style.width = wrap.offsetWidth + 'px';
+    canvas.style.height = wrap.offsetHeight + 'px';
+    ctxC.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  /* Map SVG viewBox coords to pixel coords */
+  function svgToPixel(svgX, svgY) {
+    var wrap = document.getElementById('sankeyWrap');
+    var wrapW = wrap.offsetWidth;
+    var wrapH = wrap.offsetHeight;
+    // viewBox is 0 0 1060 340, preserveAspectRatio xMidYMid meet
+    var vbW = 1060, vbH = 340;
+    var scaleX = wrapW / vbW;
+    var scaleY = wrapH / vbH;
+    var scale = Math.min(scaleX, scaleY);
+    var drawW = vbW * scale;
+    var drawH = vbH * scale;
+    var offX = (wrapW - drawW) / 2;
+    var offY = (wrapH - drawH) / 2;
+    return {
+      x: offX + svgX * scale,
+      y: offY + svgY * scale
+    };
+  }
+
+  /* Build flow connection data in SVG coords */
+  function getFlowConnections() {
+    return flows.map(function (f) {
+      var fromY = f.from.y + f.from.h / 2;
+      var toY = f.to.y + f.to.h / 2;
+      var fromSvgX = leftX + nodeW;
+      var toSvgX = rightX;
+      return {
+        x0: fromSvgX, y0: fromY,
+        x1: toSvgX, y1: toY,
+        thickness: f.thickness,
+        cls: f.cls
+      };
+    });
+  }
+
+  /* Particle */
+  function Particle(conn) {
+    this.conn = conn;
+    this.t = 0;
+    this.speed = 0.004 + Math.random() * 0.005;
+    this.size = 2 + Math.random() * 2;
+    this.trail = [];
+    this.maxTrail = 10 + Math.floor(Math.random() * 6);
+    this._offset = (Math.random() - 0.5) * conn.thickness * 0.6;
+    this._seed = Math.random() * Math.PI * 2;
+
+    if (conn.cls === 'primary') {
+      var a = 0.5 + Math.random() * 0.4;
+      this.color = 'rgba(0, 0, 0, ' + a + ')';
+      this.trailBase = 'rgba(0, 0, 0, ';
+    } else {
+      var a2 = 0.5 + Math.random() * 0.4;
+      this.color = 'rgba(245, 224, 3, ' + a2 + ')';
+      this.trailBase = 'rgba(245, 224, 3, ';
+    }
+  }
+
+  Particle.prototype.update = function () {
+    this.t += this.speed;
+    if (this.t > 1) return false;
+
+    var c = this.conn;
+    var cpX = (c.x0 + c.x1) / 2;
+    var t = this.t;
+    var mt = 1 - t;
+
+    // cubic bezier matching the Sankey flow shape
+    var svgX = mt * mt * mt * c.x0 + 3 * mt * mt * t * cpX + 3 * mt * t * t * cpX + t * t * t * c.x1;
+    var svgY = mt * mt * mt * c.y0 + 3 * mt * mt * t * c.y0 + 3 * mt * t * t * c.y1 + t * t * t * c.y1;
+
+    // offset within flow band + slight wander
+    svgY += this._offset + Math.sin(t * Math.PI * 3 + this._seed) * 4;
+
+    var px = svgToPixel(svgX, svgY);
+    this.x = px.x;
+    this.y = px.y;
+
+    this.trail.push({ x: px.x, y: px.y });
+    if (this.trail.length > this.maxTrail) this.trail.shift();
+    return true;
+  };
+
+  Particle.prototype.draw = function (ctx) {
+    for (var i = 0; i < this.trail.length; i++) {
+      var p = this.trail[i];
+      var a = (i / this.trail.length) * 0.25;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, this.size * 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = this.trailBase + a + ')';
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  };
+
+  /* Spawn */
+  var flowConns = [];
+  var spawnCounter = 0;
+
+  function spawnParticle() {
+    if (flowConns.length === 0) return;
+    // weighted by thickness
+    var totalW = 0;
+    flowConns.forEach(function (c) { totalW += c.thickness; });
+    var r = Math.random() * totalW;
+    var cum = 0;
+    var chosen = flowConns[0];
+    for (var i = 0; i < flowConns.length; i++) {
+      cum += flowConns[i].thickness;
+      if (r <= cum) { chosen = flowConns[i]; break; }
+    }
+    particles.push(new Particle(chosen));
+  }
+
+  /* Animation loop */
+  function animateParticles() {
+    if (!particlesRunning) return;
+    var wrap = document.getElementById('sankeyWrap');
+    ctxC.clearRect(0, 0, wrap.offsetWidth, wrap.offsetHeight);
+
+    spawnCounter++;
+    if (spawnCounter % 2 === 0) spawnParticle();
+
+    var alive = [];
+    particles.forEach(function (p) {
+      if (p.update()) {
+        p.draw(ctxC);
+        alive.push(p);
+      }
+    });
+    particles = alive;
+    if (particles.length > 100) particles = particles.slice(particles.length - 100);
+
+    requestAnimationFrame(animateParticles);
+  }
+
+  /* Click to start */
+  document.getElementById('sankeyWrap').addEventListener('click', function () {
+    if (!particlesRunning) {
+      resizeCanvas();
+      flowConns = getFlowConnections();
+      particlesRunning = true;
+      document.getElementById('clickHint').classList.add('hidden');
+      animateParticles();
+    }
+  });
+
+  /* Handle resize */
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      if (particlesRunning) {
+        resizeCanvas();
+      }
+    }, 200);
+  });
+
+})();
+</script>
+</body>
+</html>

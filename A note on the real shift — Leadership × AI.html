@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<!-- saved from url=(0061)file:///C:/Users/ARUN/Downloads/leadership-ai-timeline_1.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A note on the real shift — Leadership × AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./A note on the real shift — Leadership × AI_files/css2" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFFFFF;
+  --bg-soft: #FAFAF5;
+  --ink: #000000;
+  --ink-1: #1A1A1A;
+  --ink-2: #5A5A5A;
+  --ink-3: #B0B0B0;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-2: rgba(0, 0, 0, 0.14);
+  --accent: #F5E003;
+  --accent-deep: #000000;
+  --accent-soft: #FEFAC4;
+  --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Highlighter-pen treatment for emphasized italics on light grounds */
+.hl-mark,
+.hero h1 em,
+.era-content h2 em,
+.waves h2 em,
+.moment-right h2 em,
+.expect h2 em,
+.shift h2 em,
+.close-quote .hl {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+  padding: 0 6px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Dark-ground emphasized italics stay yellow */
+.agentic h2 em,
+.verb.stress {
+  color: var(--accent);
+  font-style: italic;
+  font-weight: 500;
+  background: none;
+}
+
+/* === BRAND BAR === */
+.brand-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 36px;
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: #FFFFFF;
+}
+.brand-mark {
+  width: 22px; height: 22px;
+  border: 1.5px solid #FFFFFF; border-radius: 50%;
+  position: relative;
+}
+.brand-mark::before {
+  content: ''; position: absolute; inset: 4px;
+  background: #FFFFFF; border-radius: 50%;
+  transform: scale(0.4); transform-origin: center;
+}
+.year-ticker {
+  display: flex; align-items: baseline; gap: 12px;
+  color: #FFFFFF;
+}
+.year-ticker-label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 1.8px; text-transform: uppercase;
+  opacity: 0.6;
+}
+.year-ticker-value {
+  font-family: var(--mono); font-size: 14px;
+  letter-spacing: 0.5px; font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  min-width: 4ch;
+}
+
+/* === SIDE RAIL === */
+.rail {
+  position: fixed; right: 36px; top: 50%; transform: translateY(-50%);
+  z-index: 30; pointer-events: none;
+  display: flex; flex-direction: column; gap: 0;
+  width: 110px;
+}
+.rail-track {
+  position: absolute; right: 0; top: 0; bottom: 0;
+  width: 1px; background: var(--line-2);
+}
+.rail-progress {
+  position: absolute; right: 0; top: 0;
+  width: 3px; background: var(--accent);
+  transform-origin: top; transform: scaleY(0);
+  transition: transform 0.12s linear;
+  height: 100%;
+  right: -1px;
+}
+.rail-tick {
+  display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+  padding: 16px 14px 16px 0;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 1.4px; color: var(--ink-3);
+  position: relative;
+  transition: color 0.4s var(--ease-out);
+}
+.rail-tick::after {
+  content: ''; position: absolute; right: -4px; top: 50%;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--bg); border: 1px solid var(--ink-3);
+  transform: translateY(-50%);
+  transition: all 0.4s var(--ease-out);
+}
+.rail-tick.active { color: var(--ink); font-weight: 500; }
+.rail-tick.active::after {
+  background: var(--accent); border-color: var(--ink);
+  transform: translateY(-50%) scale(1.3);
+}
+
+/* === SECTIONS === */
+section {
+  min-height: 100vh;
+  position: relative;
+  padding: 100px 96px;
+  display: flex; flex-direction: column;
+}
+
+/* Reveal system */
+.rv {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 1.1s var(--ease-out), transform 1.1s var(--ease-out);
+}
+.rv.in { opacity: 1; transform: translateY(0); }
+.rv.d1 { transition-delay: 0.10s; }
+.rv.d2 { transition-delay: 0.25s; }
+.rv.d3 { transition-delay: 0.40s; }
+.rv.d4 { transition-delay: 0.55s; }
+.rv.d5 { transition-delay: 0.70s; }
+.rv.d6 { transition-delay: 0.85s; }
+
+.plx { will-change: transform; }
+
+/* === SECTION 1 — HERO === */
+.hero {
+  justify-content: center;
+  padding-top: 120px;
+  position: relative;
+}
+.hero-eyebrow {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-1);
+  margin-bottom: 48px;
+  display: flex; align-items: center; gap: 16px;
+}
+.hero-eyebrow::before {
+  content: ''; width: 40px; height: 8px; background: var(--accent);
+}
+.hero h1 {
+  font-size: clamp(48px, 7.5vw, 128px);
+  font-weight: 300; letter-spacing: -0.03em;
+  line-height: 0.98;
+  max-width: 18ch;
+}
+.hero-sub {
+  margin-top: 48px; max-width: 52ch;
+  font-size: 18px; line-height: 1.5;
+  color: var(--ink-1); font-weight: 300;
+}
+.scroll-hint {
+  position: absolute; bottom: 56px; left: 96px;
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.scroll-hint-line {
+  width: 1px; height: 40px; background: var(--ink-3);
+  position: relative; overflow: hidden;
+}
+.scroll-hint-line::after {
+  content: ''; position: absolute; inset: 0;
+  background: var(--ink);
+  transform: translateY(-100%);
+  animation: trickle 2.6s var(--ease-out) infinite;
+}
+@keyframes trickle {
+  0% { transform: translateY(-100%); }
+  60%, 100% { transform: translateY(100%); }
+}
+.hero-year-ghost {
+  position: absolute; right: -3vw; bottom: -5vw;
+  font-size: clamp(280px, 42vw, 720px);
+  font-weight: 200; letter-spacing: -0.05em;
+  color: var(--bg-soft);
+  line-height: 0.8; pointer-events: none; z-index: -1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* === SECTION 2 — OLD WORLD === */
+.era {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) 1.1fr;
+  gap: 80px;
+  align-items: center;
+}
+.era-marker {
+  display: flex; flex-direction: column; gap: 16px;
+  position: sticky; top: 28vh; align-self: start;
+}
+.era-label {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-1);
+  display: inline-flex; align-items: center; gap: 12px;
+  width: fit-content;
+}
+.era-label::before {
+  content: ''; width: 24px; height: 8px; background: var(--accent);
+}
+.era-year {
+  font-size: clamp(100px, 16vw, 240px);
+  font-weight: 200; letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.era-year .sep { color: var(--ink-3); font-weight: 200; }
+.era-sub {
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--ink-2);
+  margin-top: 8px;
+}
+.era-content h2 {
+  font-size: clamp(30px, 3.6vw, 52px);
+  font-weight: 400; letter-spacing: -0.02em;
+  line-height: 1.1;
+  max-width: 22ch;
+  margin-bottom: 32px;
+}
+.era-content p {
+  font-size: 17px; line-height: 1.55;
+  color: var(--ink-1); font-weight: 400;
+  max-width: 54ch;
+  margin-bottom: 20px;
+}
+.era-pull {
+  margin-top: 40px; padding: 28px 32px;
+  background: var(--ink); color: var(--bg);
+  font-size: 20px; line-height: 1.4;
+  font-weight: 400;
+  max-width: 48ch;
+  position: relative;
+}
+.era-pull::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 6px; background: var(--accent);
+}
+.era-pull em {
+  color: var(--accent);
+  font-weight: 500; font-style: normal;
+}
+
+/* === SECTION 3 — WAVES TIMELINE === */
+.waves {
+  justify-content: center;
+  padding: 120px 96px;
+  background: var(--bg-soft);
+}
+.waves h2 {
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 400; letter-spacing: -0.02em;
+  line-height: 1.1;
+  max-width: 30ch;
+  margin-bottom: 88px;
+}
+.waves-rail {
+  position: relative; margin: 0 20px;
+}
+.waves-line {
+  height: 1px; background: var(--line-2); position: relative;
+}
+.waves-line::after {
+  content: ''; position: absolute; inset: 0;
+  background: var(--ink);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 2s var(--ease-out) 0.3s;
+}
+.waves.in .waves-line::after { transform: scaleX(1); }
+
+.wave-stations {
+  position: absolute; inset: 0;
+  display: flex; justify-content: space-between;
+  top: 50%;
+}
+.wave {
+  display: flex; flex-direction: column; align-items: center;
+  position: relative; transform: translateY(-50%);
+}
+.wave-dot {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--bg); border: 1.5px solid var(--ink-3);
+  z-index: 2; position: relative;
+  transition: all 0.6s var(--ease-out);
+}
+.waves.in .wave-dot { border-color: var(--ink); background: var(--bg); }
+.waves.in .wave.featured .wave-dot {
+  width: 20px; height: 20px;
+  background: var(--accent); border-color: var(--ink); border-width: 2px;
+  box-shadow: 0 0 0 8px rgba(245, 224, 3, 0.2);
+}
+.wave-year {
+  position: absolute; bottom: calc(100% + 24px);
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1.4px; color: var(--ink-2);
+  white-space: nowrap;
+  font-weight: 500;
+}
+.wave-name {
+  position: absolute; top: calc(100% + 28px);
+  font-size: 16px; font-weight: 500;
+  letter-spacing: -0.01em; color: var(--ink);
+  white-space: nowrap;
+}
+.wave.featured .wave-name {
+  color: var(--ink);
+  background: var(--accent);
+  padding: 2px 8px;
+}
+.wave-desc {
+  position: absolute; top: calc(100% + 58px);
+  font-size: 12px; color: var(--ink-2);
+  white-space: nowrap;
+}
+.wave.featured .wave-desc { top: calc(100% + 62px); }
+.waves-caption {
+  margin-top: 200px; max-width: 62ch;
+  margin-left: auto; margin-right: auto;
+  text-align: center;
+  font-size: 16px; line-height: 1.55;
+  color: var(--ink-1);
+}
+.waves-caption em {
+  font-style: italic; font-weight: 500; color: var(--ink);
+  background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+  padding: 0 4px;
+}
+
+/* === SECTION 4 — 2022 — YELLOW MOMENT === */
+.moment {
+  background: var(--accent);
+  color: var(--ink);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.moment .moment-year {
+  font-size: clamp(160px, 24vw, 420px);
+  font-weight: 200; letter-spacing: -0.05em;
+  line-height: 0.85; color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.moment .moment-year .month {
+  display: block;
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 28px; font-weight: 500;
+  display: flex; align-items: center; gap: 12px;
+}
+.moment .moment-year .month::before {
+  content: ''; width: 24px; height: 2px; background: var(--ink);
+}
+.moment-right h2 {
+  font-size: clamp(32px, 3.8vw, 56px);
+  font-weight: 400; letter-spacing: -0.02em;
+  line-height: 1.08;
+  margin-bottom: 32px;
+  max-width: 18ch;
+  color: var(--ink);
+}
+.moment-right h2 em {
+  font-style: italic; font-weight: 500; color: var(--ink);
+  background: linear-gradient(transparent 62%, var(--bg) 62%, var(--bg) 94%, transparent 94%);
+  padding: 0 6px;
+  box-decoration-break: clone;
+}
+.moment-right p {
+  font-size: 17px; line-height: 1.55;
+  color: var(--ink-1); max-width: 42ch;
+  margin-bottom: 18px;
+}
+.moment-tag {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--ink);
+  margin-top: 28px;
+  padding: 8px 16px;
+  background: var(--ink); color: var(--accent);
+}
+
+/* === SECTION 5 — 2024 AGENTIC === */
+.agentic {
+  background: var(--ink);
+  color: var(--bg);
+  justify-content: center;
+}
+.agentic-year {
+  font-size: clamp(160px, 24vw, 400px);
+  font-weight: 200; letter-spacing: -0.05em;
+  line-height: 0.85; color: var(--bg);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 40px;
+}
+.agentic-label {
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  display: inline-flex; align-items: center; gap: 12px;
+  width: fit-content;
+}
+.agentic-label::before {
+  content: ''; width: 24px; height: 8px; background: var(--accent);
+}
+.agentic h2 {
+  font-size: clamp(32px, 4vw, 64px);
+  font-weight: 300; letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--bg); max-width: 20ch;
+  margin-bottom: 56px;
+}
+.verbs {
+  display: flex; gap: 32px; align-items: baseline;
+  font-size: clamp(40px, 5.5vw, 80px);
+  font-weight: 300; letter-spacing: -0.03em;
+  line-height: 1;
+  flex-wrap: wrap;
+}
+.verb { color: rgba(255, 255, 255, 0.35); }
+.verb.stress {
+  color: var(--accent); font-weight: 500; font-style: italic;
+  position: relative;
+}
+.verb.stress::after {
+  content: ''; position: absolute; left: 0; right: 10px; bottom: -14px;
+  height: 3px; background: var(--accent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 1s var(--ease-out) 0.8s;
+}
+.agentic.in .verb.stress::after { transform: scaleX(1); }
+.agentic-sub {
+  margin-top: 72px; max-width: 48ch;
+  font-size: 17px; line-height: 1.55;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 300;
+}
+
+/* === SECTION 6 — DEMOCRATIZATION === */
+.dem {
+  justify-content: center;
+}
+.dem-header {
+  display: grid; grid-template-columns: auto 1fr; gap: 80px;
+  align-items: baseline; margin-bottom: 72px;
+}
+.dem-year {
+  font-size: clamp(120px, 18vw, 260px);
+  font-weight: 200; letter-spacing: -0.04em;
+  line-height: 0.9; color: var(--ink);
+}
+.dem-header-right .label {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-1);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 14px;
+}
+.dem-header-right .label::before {
+  content: ''; width: 24px; height: 8px; background: var(--accent);
+}
+.dem-header-right h2 {
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 400; letter-spacing: -0.02em;
+  line-height: 1.1; max-width: 22ch;
+}
+.pillars {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.pillar {
+  background: var(--bg);
+  padding: 36px 40px 40px;
+  border-right: 1px solid var(--line-2);
+  transition: background 0.4s var(--ease-out);
+  position: relative;
+}
+.pillar:last-child { border-right: none; }
+.pillar:hover { background: var(--accent); }
+.pillar-num {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1.6px; color: var(--ink);
+  margin-bottom: 56px;
+  font-weight: 500;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.pillar-num::before {
+  content: ''; width: 18px; height: 4px; background: var(--accent);
+  transition: background 0.4s var(--ease-out);
+}
+.pillar:hover .pillar-num::before { background: var(--ink); }
+.pillar h3 {
+  font-size: 26px; font-weight: 500; letter-spacing: -0.015em;
+  line-height: 1.15; margin-bottom: 14px;
+}
+.pillar p {
+  font-size: 14px; line-height: 1.6;
+  color: var(--ink-1);
+}
+.platforms-strip {
+  margin-top: 48px; display: flex; align-items: center; gap: 16px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--ink-2);
+  flex-wrap: wrap;
+}
+.platforms-strip .lead { color: var(--ink-3); }
+.platforms-strip .sep { color: var(--ink-3); }
+
+/* === SECTION 7 — EXPECTATION === */
+.expect h2 {
+  font-size: clamp(38px, 4.6vw, 72px);
+  font-weight: 300; letter-spacing: -0.025em;
+  line-height: 1.05;
+  max-width: 18ch;
+  margin-bottom: 72px;
+}
+.contrast {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.cbox {
+  padding: 44px 48px;
+  position: relative;
+}
+.cbox.neg {
+  background: var(--bg);
+  border: 1px solid var(--line-2);
+}
+.cbox.pos {
+  background: var(--accent);
+  color: var(--ink);
+}
+.cbox .tag {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 12px;
+  font-weight: 500;
+}
+.cbox .tag::before {
+  content: ''; width: 24px; height: 2px; background: currentColor;
+}
+.cbox.neg .tag { color: var(--ink-3); }
+.cbox.pos .tag { color: var(--ink); }
+.cbox h3 {
+  font-size: 28px; font-weight: 500; letter-spacing: -0.015em;
+  line-height: 1.15; margin-bottom: 16px;
+}
+.cbox.neg h3 { color: var(--ink-2); }
+.cbox.pos h3 { color: var(--ink); }
+.cbox p { font-size: 14px; line-height: 1.6; }
+.cbox.neg p { color: var(--ink-2); }
+.cbox.pos p { color: var(--ink-1); }
+
+/* === SECTION 8 — FIVE CAPABILITIES === */
+.caps-section h2 {
+  font-size: clamp(30px, 3.6vw, 52px);
+  font-weight: 400; letter-spacing: -0.02em;
+  line-height: 1.1; max-width: 24ch;
+  margin-bottom: 64px;
+}
+.caps {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.cap {
+  background: var(--bg); padding: 32px 28px 36px;
+  display: flex; flex-direction: column;
+  min-height: 280px;
+  border-right: 1px solid var(--line-2);
+  transition: background 0.4s var(--ease-out);
+  position: relative;
+}
+.cap:last-child { border-right: none; }
+.cap:hover { background: var(--accent); }
+.cap-num {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1.6px; color: var(--ink);
+  margin-bottom: 64px;
+  font-weight: 500;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.cap-num::before {
+  content: ''; width: 14px; height: 4px; background: var(--accent);
+  transition: background 0.4s var(--ease-out);
+}
+.cap:hover .cap-num::before { background: var(--ink); }
+.cap h3 {
+  font-size: 24px; font-weight: 500; letter-spacing: -0.015em;
+  line-height: 1.15; margin-bottom: 12px;
+}
+.cap p {
+  font-size: 13px; line-height: 1.55;
+  color: var(--ink-1);
+}
+
+/* === SECTION 9 — DEEPER SHIFT === */
+.shift {
+  justify-content: center;
+}
+.shift-label {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-1); margin-bottom: 32px;
+  display: flex; align-items: center; gap: 14px;
+}
+.shift-label::before {
+  content: ''; width: 24px; height: 8px; background: var(--accent);
+}
+.shift h2 {
+  font-size: clamp(36px, 4.4vw, 68px);
+  font-weight: 300; letter-spacing: -0.025em;
+  line-height: 1.05;
+  max-width: 22ch;
+  margin-bottom: 72px;
+}
+.ba {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: 36px; align-items: stretch;
+  margin-bottom: 48px;
+}
+.ba-card {
+  padding: 44px 48px;
+  display: flex; flex-direction: column; justify-content: center;
+  min-height: 200px;
+  border: 1px solid var(--line-2);
+}
+.ba-card.before { background: var(--bg); }
+.ba-card.after {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.ba-card .tag {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  margin-bottom: 24px; font-weight: 500;
+}
+.ba-card.before .tag { color: var(--ink-3); }
+.ba-card.after .tag { color: var(--ink); }
+.ba-card h3 {
+  font-size: 32px; font-weight: 500; letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.ba-card.before h3 { color: var(--ink-2); }
+.ba-card.after h3 { color: var(--ink); }
+.ba-arrow {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 4px;
+}
+.ba-arrow svg { width: 56px; height: 20px; }
+.ba-arrow path { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+.shift-caption {
+  max-width: 68ch;
+  font-size: 16px; line-height: 1.55;
+  color: var(--ink-1);
+  padding-left: 28px;
+  border-left: 4px solid var(--accent);
+}
+.shift-caption em {
+  font-style: italic; font-weight: 500; color: var(--ink);
+  background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+  padding: 0 4px;
+}
+
+/* === SECTION 10 — CLOSE === */
+.close-section {
+  justify-content: center; align-items: center; text-align: center;
+  background: var(--ink); color: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.close-mark {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(120px, 16vw, 220px);
+  font-weight: 400; line-height: 0.4;
+  color: var(--accent); opacity: 0.7;
+  margin-bottom: 48px;
+}
+.close-quote {
+  font-size: clamp(30px, 3.6vw, 52px);
+  font-weight: 300; letter-spacing: -0.022em;
+  line-height: 1.25;
+  max-width: 28ch;
+  color: var(--bg);
+  position: relative; z-index: 1;
+}
+.close-quote .hl {
+  font-style: italic; font-weight: 500; color: var(--ink);
+  background: var(--accent);
+  padding: 2px 10px;
+  display: inline-block;
+  transform: translateY(-2px);
+}
+.close-tag {
+  margin-top: 72px;
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: 2.4px; text-transform: uppercase;
+  color: var(--accent);
+  display: flex; align-items: center; gap: 20px;
+  position: relative; z-index: 1;
+  font-weight: 500;
+}
+.close-tag::before, .close-tag::after {
+  content: ''; width: 36px; height: 1px; background: var(--accent);
+}
+.close-year-bg {
+  position: absolute; right: -8vw; top: 50%; transform: translateY(-50%);
+  font-size: clamp(400px, 58vw, 900px);
+  font-weight: 200; letter-spacing: -0.05em;
+  color: rgba(255, 255, 255, 0.04);
+  line-height: 0.8; pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  z-index: 0;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  section { padding: 100px 24px; }
+  .brand-bar { padding: 16px 20px; }
+  .rail { display: none; }
+  .scroll-hint { left: 24px; }
+  .era { grid-template-columns: 1fr; gap: 40px; }
+  .era-marker { position: static; }
+  .era-year { font-size: 88px; }
+  .moment { grid-template-columns: 1fr; gap: 40px; }
+  .moment .moment-year { font-size: 128px; }
+  .agentic-year { font-size: 136px; }
+  .verbs { font-size: 40px; gap: 20px; }
+  .dem-header { grid-template-columns: 1fr; gap: 32px; }
+  .dem-year { font-size: 112px; }
+  .pillars { grid-template-columns: 1fr; }
+  .pillar { border-right: none; border-bottom: 1px solid var(--line-2); }
+  .pillar:last-child { border-bottom: none; }
+  .contrast { grid-template-columns: 1fr; }
+  .caps { grid-template-columns: 1fr 1fr; }
+  .cap { min-height: 180px; border-bottom: 1px solid var(--line-2); }
+  .cap:nth-child(even) { border-right: none; }
+  .ba { grid-template-columns: 1fr; gap: 20px; }
+  .ba-arrow { transform: rotate(90deg); padding: 12px 0; }
+  .hero h1 { font-size: 52px; }
+  .close-quote { font-size: 30px; }
+  .hero-year-ghost, .close-year-bg { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="brand-bar">
+  <div class="brand">
+    <span class="brand-mark"></span>
+    <span>Leadership × AI</span>
+  </div>
+  <div class="year-ticker">
+    <span class="year-ticker-label">Year</span>
+    <span class="year-ticker-value" id="yearTicker">2009</span>
+  </div>
+</header>
+
+<aside class="rail" id="rail">
+  <div class="rail-track"></div>
+  <div class="rail-progress" id="railProgress" style="transform: scaleY(0);"></div>
+  <div class="rail-tick active" data-year="2026">2026</div>
+  <div class="rail-tick" data-year="2024">2024</div>
+  <div class="rail-tick" data-year="2022">2022</div>
+  <div class="rail-tick" data-year="2015">2015</div>
+  <div class="rail-tick" data-year="2000">2000</div>
+  <div class="rail-tick" data-year="1970">1970</div>
+</aside>
+
+<main>
+
+<section class="hero in" data-year="2026">
+  <div class="hero-year-ghost">2026</div>
+  <div class="hero-eyebrow rv d1 in">A note to leadership</div>
+  <h1 class="rv d2 in">The shift isn't capability.<br><em>It's who can act on it.</em></h1>
+  <p class="hero-sub rv d3 in">What changed with AI is not just what these systems can do — it's who can now put them to work. This is a short walk through that shift, and what it asks of us now.</p>
+  <div class="scroll-hint rv d4">
+    <span class="scroll-hint-line"></span>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<section class="era" data-year="1970">
+  <div class="era-marker">
+    <span class="era-label rv d1">The old world</span>
+    <span class="era-year rv d2">1970<span class="sep">—</span>2015</span>
+    <span class="era-sub rv d3">Four decades of gatekeeping</span>
+  </div>
+  <div class="era-content">
+    <h2 class="rv d2">Analytics and AI lived behind specialists.</h2>
+    <p class="rv d3">If you wanted an insight, a model, or an automation, you filed a request. Handed it off. Waited days, sometimes weeks. The answer came back — often answering the wrong question by the time it arrived.</p>
+    <p class="rv d4">This is how decisions were made, for forty years. Not because the technology was weak — much of the math has been settled since the 1970s — but because the interface was narrow and the expertise was scarce.</p>
+    <div class="era-pull rv d5">The bottleneck was never data. It was <em>access to capability</em>.</div>
+  </div>
+</section>
+
+<section class="waves" data-year="2015">
+  <h2 class="rv d1">Six waves of analytics, each compressing the distance between a question and an <em>answer</em>.</h2>
+  <div class="waves-rail rv d2">
+    <div class="waves-line"></div>
+    <div class="wave-stations">
+      <div class="wave">
+        <span class="wave-year">1970s</span>
+        <span class="wave-dot"></span>
+        <span class="wave-name">Descriptive</span>
+        <span class="wave-desc">what happened</span>
+      </div>
+      <div class="wave">
+        <span class="wave-year">1990s</span>
+        <span class="wave-dot"></span>
+        <span class="wave-name">Diagnostic</span>
+        <span class="wave-desc">why it happened</span>
+      </div>
+      <div class="wave">
+        <span class="wave-year">2005</span>
+        <span class="wave-dot"></span>
+        <span class="wave-name">Predictive</span>
+        <span class="wave-desc">what will happen</span>
+      </div>
+      <div class="wave">
+        <span class="wave-year">2015</span>
+        <span class="wave-dot"></span>
+        <span class="wave-name">ML at scale</span>
+        <span class="wave-desc">what to decide</span>
+      </div>
+      <div class="wave featured">
+        <span class="wave-year">2022</span>
+        <span class="wave-dot"></span>
+        <span class="wave-name">Generative</span>
+        <span class="wave-desc">what to create</span>
+      </div>
+      <div class="wave featured">
+        <span class="wave-year">2024</span>
+        <span class="wave-dot"></span>
+        <span class="wave-name">Agentic</span>
+        <span class="wave-desc">what to do</span>
+      </div>
+    </div>
+  </div>
+  <p class="waves-caption rv d3">Each wave was faster and broader than the last. But the last two are <em>categorically different</em> — they no longer just describe or predict. They generate, and they act.</p>
+</section>
+
+<section class="moment" data-year="2022">
+  <div class="moment-left">
+    <div class="moment-year rv d1">
+      <span class="month">November 2022</span>
+      2022
+    </div>
+  </div>
+  <div class="moment-right">
+    <h2 class="rv d2">A chat box changed the <em>access model</em>.</h2>
+    <p class="rv d3">When ChatGPT launched, it wasn't just a better model. It was the first time a non-specialist could directly instruct AI — in plain language — and get a useful result back.</p>
+    <p class="rv d4">Within eighteen months, the same pattern was embedded in every tool a knowledge worker already used. Copilot in Office. Gemini in Workspace. Cursor in IDEs. The interface became the sentence.</p>
+    <div class="moment-tag rv d5">
+      <span>The inflection begins</span>
+    </div>
+  </div>
+</section>
+
+<section class="agentic" data-year="2024">
+  <div class="agentic-label rv d1">2024 — and beyond</div>
+  <div class="agentic-year rv d2">2024</div>
+  <h2 class="rv d3">These systems don't just analyze anymore.</h2>
+  <div class="verbs rv d4">
+    <span class="verb">interact.</span>
+    <span class="verb">generate.</span>
+    <span class="verb stress">act.</span>
+  </div>
+  <p class="agentic-sub rv d5">Agents book the travel, draft the pull request, run the test suite, escalate the ticket. Not perfectly — not yet — but well enough that the question shifts from "can they?" to "where should they?"</p>
+</section>
+
+<section class="dem" data-year="2026">
+  <div class="dem-header">
+    <div class="dem-year rv d1">2026</div>
+    <div class="dem-header-right">
+      <div class="label rv d1">Democratization</div>
+      <h2 class="rv d2">Three things converged to put these tools in reach of everyone.</h2>
+    </div>
+  </div>
+  <div class="pillars">
+    <div class="pillar rv d3">
+      <div class="pillar-num">01</div>
+      <h3>Natural language</h3>
+      <p>Interfaces replaced code. A clear question, asked well, is now often enough to get a working answer back.</p>
+    </div>
+    <div class="pillar rv d4">
+      <div class="pillar-num">02</div>
+      <h3>Composable tooling</h3>
+      <p>Capabilities snap together like blocks. Models, retrieval, memory, and actions now compose rather than collide.</p>
+    </div>
+    <div class="pillar rv d5">
+      <div class="pillar-num">03</div>
+      <h3>Production platforms</h3>
+      <p>Enterprise-grade AI is one prompt away. The last mile between an idea and a working prototype is the shortest it has ever been.</p>
+    </div>
+  </div>
+  <div class="platforms-strip rv d6">
+    <span class="lead">In practice</span>
+    <span>Databricks</span><span class="sep">·</span>
+    <span>Microsoft Copilot</span><span class="sep">·</span>
+    <span>ChatGPT</span><span class="sep">·</span>
+    <span>Claude</span><span class="sep">·</span>
+    <span>&amp; the tools your teams already use</span>
+  </div>
+</section>
+
+<section class="expect" data-year="2026">
+  <h2 class="rv d1">Leaders aren't expected to become engineers. They're expected to operate with <em>fluency</em>.</h2>
+  <div class="contrast">
+    <div class="cbox neg rv d2">
+      <div class="tag">Not the bar</div>
+      <h3>Build from first principles</h3>
+      <p>No one is asking leaders to write models, tune hyperparameters, or ship production code themselves. Depth of technical skill is not the expectation.</p>
+    </div>
+    <div class="cbox pos rv d3">
+      <div class="tag">The bar</div>
+      <h3>Operate with fluency</h3>
+      <p>Breadth of applied understanding. Knowing what these systems can do, where they fit, and how to get real work through them — directly, not only via a team.</p>
+    </div>
+  </div>
+</section>
+
+<section class="caps-section" data-year="2026">
+  <h2 class="rv d1">What fluent operation looks like, concretely.</h2>
+  <div class="caps">
+    <div class="cap rv d2">
+      <div class="cap-num">01</div>
+      <h3>Frame</h3>
+      <p>Pose problems in a way AI systems can actually act on.</p>
+    </div>
+    <div class="cap rv d3">
+      <div class="cap-num">02</div>
+      <h3>Assemble</h3>
+      <p>Orchestrate workflows from existing tools — not code, compose.</p>
+    </div>
+    <div class="cap rv d4">
+      <div class="cap-num">03</div>
+      <h3>Extract</h3>
+      <p>Pull insights directly from data, without routing through intermediaries.</p>
+    </div>
+    <div class="cap rv d5">
+      <div class="cap-num">04</div>
+      <h3>Identify</h3>
+      <p>Spot where decisions can be automated or augmented — and where they shouldn't be.</p>
+    </div>
+    <div class="cap rv d6">
+      <div class="cap-num">05</div>
+      <h3>Scale</h3>
+      <p>Spread capability across teams — as defaults, not as isolated pilots.</p>
+    </div>
+  </div>
+</section>
+
+<section class="shift" data-year="2026">
+  <div class="shift-label rv d1">The deeper shift</div>
+  <h2 class="rv d2">Leaders are moving from consumers of outputs, to <em>designers of outcomes</em>.</h2>
+  <div class="ba">
+    <div class="ba-card before rv d3">
+      <div class="tag">Before</div>
+      <h3>Consumer of outputs</h3>
+    </div>
+    <div class="ba-arrow rv d4">
+      <svg viewBox="0 0 56 20"><path d="M 0 10 L 50 10 M 42 4 L 50 10 L 42 16"></path></svg>
+    </div>
+    <div class="ba-card after rv d5">
+      <div class="tag">Now</div>
+      <h3>Designer of outcomes</h3>
+    </div>
+  </div>
+  <p class="shift-caption rv d6">With agentic AI this extends further — leaders can now configure systems that don't just inform decisions, <em>but execute parts of them</em>.</p>
+</section>
+
+<section class="close-section" data-year="2026">
+  <div class="close-year-bg">—</div>
+  <div class="close-mark rv d1">"</div>
+  <div class="close-quote rv d2">
+    Earlier, leaders asked for insights.<br>
+    Now, they generate, validate, and act on them —<br>
+    <span class="hl">in the same loop</span>.
+  </div>
+  <div class="close-tag rv d3">That is the real shift</div>
+</section>
+
+</main>
+
+<script>
+(function () {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        const sec = e.target.closest('section');
+        if (sec) sec.classList.add('in');
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -10% 0px' });
+
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+  document.querySelectorAll('section').forEach(el => io.observe(el));
+
+  const sections = Array.from(document.querySelectorAll('section[data-year]'));
+  const ticker = document.getElementById('yearTicker');
+  const railProgress = document.getElementById('railProgress');
+  const railTicks = Array.from(document.querySelectorAll('.rail-tick'));
+
+  let tickerTarget = 2026;
+  let tickerCurrent = 2026;
+
+  function activeSection() {
+    const vh = window.innerHeight;
+    const mid = window.scrollY + vh * 0.5;
+    for (let i = 0; i < sections.length; i++) {
+      const s = sections[i];
+      const top = s.offsetTop;
+      const bot = top + s.offsetHeight;
+      if (mid >= top && mid < bot) return { section: s, index: i, top, bot };
+    }
+    const last = sections[sections.length - 1];
+    return { section: last, index: sections.length - 1, top: last.offsetTop, bot: last.offsetTop + last.offsetHeight };
+  }
+
+  function onScroll() {
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - window.innerHeight;
+    const prog = max > 0 ? window.scrollY / max : 0;
+    railProgress.style.transform = `scaleY(${Math.min(1, Math.max(0, prog))})`;
+
+    const { section, index, top, bot } = activeSection();
+    const thisYear = parseInt(section.dataset.year, 10);
+    const next = sections[index + 1];
+    const nextYear = next ? parseInt(next.dataset.year, 10) : thisYear;
+
+    const localProg = Math.min(1, Math.max(0, (window.scrollY + window.innerHeight * 0.5 - top) / (bot - top)));
+    const interp = thisYear + (nextYear - thisYear) * localProg * 0.6;
+    tickerTarget = Math.round(interp);
+
+    railTicks.forEach(t => t.classList.toggle('active', parseInt(t.dataset.year, 10) === thisYear));
+  }
+
+  function tickerLoop() {
+    tickerCurrent += (tickerTarget - tickerCurrent) * 0.12;
+    if (Math.abs(tickerTarget - tickerCurrent) < 0.5) tickerCurrent = tickerTarget;
+    ticker.textContent = Math.round(tickerCurrent);
+    requestAnimationFrame(tickerLoop);
+  }
+
+  const plxEls = document.querySelectorAll('.hero-year-ghost, .era-year, .moment-year, .dem-year, .close-year-bg');
+  function parallax() {
+    const y = window.scrollY;
+    plxEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const center = rect.top + rect.height / 2;
+      const delta = (center - vh / 2) * -0.05;
+      el.style.transform = `translate3d(0, ${delta}px, 0)`;
+    });
+  }
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        onScroll();
+        parallax();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', onScroll);
+  onScroll();
+  tickerLoop();
+})();
+</script>
+
+
+</body></html>

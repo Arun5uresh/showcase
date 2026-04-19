@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>From Delay to Instant Insight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAF5;
+    --ink: #000000;
+    --ink-1: #1A1A1A;
+    --ink-2: #5A5A5A;
+    --ink-3: #B0B0B0;
+    --accent: #F5E003;
+    --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+  .wrapper { width: 100%; max-width: 960px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ink-1); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .eyebrow::before {
+    content: ''; width: 24px; height: 8px; background: var(--accent);
+  }
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 300; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 56; color: var(--ink);
+  }
+  h1 em {
+    font-style: italic; font-weight: 500; color: var(--ink);
+    background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+    padding: 0 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .chart-frame {
+    background: var(--bg-soft);
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 36px 28px 28px;
+    margin-top: 56px;
+    position: relative;
+  }
+  .chart-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: 420px;
+  }
+  .chart-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
+  .legend {
+    display: flex; justify-content: center; gap: 36px;
+    margin-top: 16px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--ink-2);
+  }
+  .legend-item { display: flex; align-items: center; gap: 10px; }
+  .legend-swatch { width: 24px; height: 3px; display: inline-block; }
+  .annotations {
+    display: flex; justify-content: space-between;
+    padding: 20px 60px 0;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1px; line-height: 1.55;
+  }
+  .ann { text-align: center; max-width: 200px; }
+  .ann-arrow { font-size: 16px; margin-bottom: 4px; }
+  .ann-old { color: var(--ink-3); }
+  .ann-ai { color: var(--ink-1); }
+  .caption {
+    margin-top: 48px; padding: 28px 32px;
+    background: var(--ink); color: var(--bg);
+    position: relative;
+    font-size: 20px; line-height: 1.4; font-weight: 400;
+  }
+  .caption::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 6px; background: var(--accent);
+  }
+  .caption em {
+    color: var(--accent); font-weight: 500; font-style: normal;
+  }
+  .caption .source {
+    display: block; margin-top: 12px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; color: rgba(255,255,255,0.5);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="eyebrow">Time-to-insight distribution</div>
+  <h1>From Delay to <em>Instant Insight</em></h1>
+
+  <div class="chart-frame">
+    <div class="chart-canvas-wrap">
+      <canvas id="distChart"></canvas>
+    </div>
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-swatch" style="background:#B0B0B0"></span>
+        <span>Old World (pre-2020)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-swatch" style="background:#F5E003"></span>
+        <span>AI Era (post-2022)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotations">
+    <div class="ann ann-old">
+      <div class="ann-arrow">&uarr;</div>
+      Peak at weeks / days<br>Long tail &rarr; slow cycle
+    </div>
+    <div class="ann ann-ai">
+      <div class="ann-arrow">&uarr;</div>
+      Peak at minutes / seconds<br>Tight curve &rarr; instant cycle
+    </div>
+  </div>
+
+  <div class="caption">
+    The distribution didn't just shift left. <em>It collapsed.</em>
+    <span class="source">&mdash; Leadership &times; AI, Time-to-Insight Analysis</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  /* ── math helpers ── */
+  function gaussian(x, mean, std) {
+    return Math.exp(-0.5 * Math.pow((x - mean) / std, 2));
+  }
+  function skewed(x, peak, width, skew) {
+    var base = gaussian(x, peak, width);
+    var tail = x > peak ? Math.exp(-((x - peak) / skew) * 0.6) : 1;
+    return base * tail;
+  }
+
+  /* ── generate smooth data (40 points) ── */
+  var LABELS = ['Weeks', '', '', '', 'Days', '', '', '', 'Hours', '', '', '', 'Minutes', '', '', '', 'Seconds'];
+  var N = LABELS.length;
+  var oldData = [];
+  var aiData = [];
+
+  for (var i = 0; i < N; i++) {
+    var t = i / (N - 1);
+    oldData.push(+(skewed(t, 0.12, 0.16, 0.32) * 100).toFixed(2));
+    aiData.push(+(gaussian(t, 0.85, 0.08) * 100).toFixed(2));
+  }
+
+  /* ── Chart.js config ── */
+  var ctx = document.getElementById('distChart').getContext('2d');
+
+  var gradOld = ctx.createLinearGradient(0, 0, 0, 400);
+  gradOld.addColorStop(0, 'rgba(176, 176, 176, 0.35)');
+  gradOld.addColorStop(1, 'rgba(176, 176, 176, 0.02)');
+
+  var gradAI = ctx.createLinearGradient(0, 0, 0, 400);
+  gradAI.addColorStop(0, 'rgba(245, 224, 3, 0.55)');
+  gradAI.addColorStop(1, 'rgba(245, 224, 3, 0.03)');
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: LABELS,
+      datasets: [
+        {
+          label: 'Old World',
+          data: oldData,
+          borderColor: '#B0B0B0',
+          borderWidth: 2.5,
+          backgroundColor: gradOld,
+          fill: true,
+          tension: 0.45,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#B0B0B0',
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 2,
+        },
+        {
+          label: 'AI Era',
+          data: aiData,
+          borderColor: '#D4C800',
+          borderWidth: 2.5,
+          backgroundColor: gradAI,
+          fill: true,
+          tension: 0.45,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#F5E003',
+          pointHoverBorderColor: '#000',
+          pointHoverBorderWidth: 2,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#000',
+          titleFont: { family: "'JetBrains Mono', monospace", size: 11, weight: '500' },
+          titleColor: '#B0B0B0',
+          bodyFont: { family: "'Hanken Grotesk', sans-serif", size: 13 },
+          bodyColor: '#fff',
+          padding: 14,
+          cornerRadius: 2,
+          displayColors: true,
+          boxWidth: 10,
+          boxHeight: 10,
+          boxPadding: 6,
+          callbacks: {
+            title: function(items) {
+              var lbl = items[0].label;
+              return lbl || '';
+            },
+            label: function(item) {
+              return ' ' + item.dataset.label + ': ' + item.parsed.y.toFixed(1);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          border: { color: '#000', width: 1 },
+          ticks: {
+            font: { family: "'JetBrains Mono', monospace", size: 11 },
+            color: '#5A5A5A',
+            padding: 8,
+            maxRotation: 0,
+          },
+          title: {
+            display: true,
+            text: 'TIME TO ANSWER',
+            font: { family: "'JetBrains Mono', monospace", size: 10 },
+            color: '#B0B0B0',
+            letterSpacing: '1.6px',
+            padding: { top: 12 },
+          }
+        },
+        y: {
+          grid: {
+            color: 'rgba(0, 0, 0, 0.06)',
+            drawBorder: false,
+          },
+          border: { display: false },
+          ticks: { display: false },
+          title: {
+            display: true,
+            text: 'RELATIVE FREQUENCY',
+            font: { family: "'JetBrains Mono', monospace", size: 10 },
+            color: '#B0B0B0',
+            padding: { bottom: 8 },
+          },
+          beginAtZero: true,
+        }
+      },
+      animation: {
+        duration: 1400,
+        easing: 'easeOutQuart',
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

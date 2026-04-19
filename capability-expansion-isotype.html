@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Who Can Act Has Expanded — Isotype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #FAFAF5;
+    --ink: #000000;
+    --ink-1: #1A1A1A;
+    --ink-2: #5A5A5A;
+    --ink-3: #B0B0B0;
+    --line: rgba(0, 0, 0, 0.08);
+    --line-2: rgba(0, 0, 0, 0.14);
+    --accent: #F5E003;
+    --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+  .iso-wrapper { width: 100%; max-width: 1020px; }
+
+  .iso-eyebrow {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ink-1); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .iso-eyebrow::before {
+    content: ''; width: 24px; height: 8px; background: var(--accent);
+  }
+  .iso-title {
+    font-family: var(--sans);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 300; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 16px; color: var(--ink);
+  }
+  .iso-title em {
+    font-style: italic; font-weight: 500; color: var(--ink);
+    background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+    padding: 0 6px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .iso-subtitle {
+    font-size: 18px; line-height: 1.5;
+    color: var(--ink-2); font-weight: 300;
+    max-width: 48ch;
+    margin-bottom: 56px;
+  }
+
+  /* ── Panels ── */
+  .iso-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--line-2);
+  }
+  .iso-panel {
+    padding: 48px 40px;
+    position: relative;
+    min-height: 460px;
+  }
+  .iso-panel.iso-before {
+    background: var(--bg-soft);
+    border-right: 1px solid var(--line-2);
+  }
+  .iso-panel.iso-now {
+    background: var(--bg);
+    cursor: pointer;
+  }
+  .iso-panel-label {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    font-weight: 600; margin-bottom: 36px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .iso-panel-label::before { content: ''; width: 18px; height: 4px; }
+  .iso-before .iso-panel-label { color: var(--ink-3); }
+  .iso-before .iso-panel-label::before { background: var(--ink-3); }
+  .iso-now .iso-panel-label { color: var(--ink); }
+  .iso-now .iso-panel-label::before { background: var(--accent); }
+
+  /* ── Click hint ── */
+  .iso-click-hint {
+    position: absolute;
+    bottom: 16px; right: 20px;
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--ink-3);
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out);
+  }
+  .iso-click-hint.visible { opacity: 1; }
+  .iso-click-hint.hidden { opacity: 0; }
+
+  /* ── Pictogram grid ── */
+  .iso-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .iso-figure {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  }
+  .iso-figure.iso-visible {
+    transform: translateY(0);
+  }
+
+  /* States */
+  .iso-figure.iso-ghost { opacity: 0.12; }
+  .iso-figure.iso-ghost.iso-visible { opacity: 0.12; }
+  .iso-figure.iso-dim { opacity: 0.35; }
+  .iso-figure.iso-dim.iso-visible { opacity: 0.35; }
+
+  .iso-figure.iso-expert svg { fill: var(--ink); }
+  .iso-figure.iso-expert.iso-visible { opacity: 1; }
+
+  .iso-figure.iso-manager svg { fill: var(--ink-3); }
+  .iso-figure.iso-manager.iso-visible { opacity: 1; }
+
+  /* Now panel states */
+  .iso-now .iso-figure.iso-ghost svg { fill: var(--ink-3); }
+
+  .iso-figure.iso-lit svg { transition: fill 0.5s var(--ease-out); }
+  .iso-figure.iso-lit.iso-lit-expert svg { fill: var(--ink); }
+  .iso-figure.iso-lit.iso-lit-manager svg { fill: var(--ink-1); }
+  .iso-figure.iso-lit.iso-lit-operator svg { fill: var(--ink-1); }
+  .iso-figure.iso-lit {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Yellow pulse for operators */
+  @keyframes iso-pulse {
+    0%   { filter: drop-shadow(0 0 0px transparent); }
+    50%  { filter: drop-shadow(0 0 8px rgba(245, 224, 3, 0.7)); }
+    100% { filter: drop-shadow(0 0 0px transparent); }
+  }
+  .iso-figure.iso-highlight {
+    animation: iso-pulse 0.6s var(--ease-out) 2;
+  }
+  .iso-figure.iso-highlight svg { fill: var(--accent) !important; }
+
+  /* ── Legend ── */
+  .iso-legend {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .iso-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out);
+  }
+  .iso-legend-item.iso-visible { opacity: 1; }
+  .iso-legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .iso-legend-dot.iso-dot-expert { background: var(--ink); }
+  .iso-legend-dot.iso-dot-manager { background: var(--ink-3); }
+  .iso-legend-dot.iso-dot-ghost { background: var(--ink-3); opacity: 0.2; }
+
+  /* Now panel legend dots */
+  .iso-now .iso-legend-dot.iso-dot-expert { background: var(--ink); }
+  .iso-now .iso-legend-dot.iso-dot-manager { background: var(--ink-1); }
+  .iso-now .iso-legend-dot.iso-dot-operator { background: var(--accent); }
+
+  .iso-legend-name {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-1);
+    letter-spacing: -0.01em;
+  }
+  .iso-legend-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .iso-before .iso-legend-tag { color: var(--ink-3); }
+  .iso-now .iso-legend-tag { color: var(--ink-2); }
+
+  /* ── Counter ── */
+  .iso-counter {
+    position: absolute;
+    bottom: 16px; left: 40px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--ink-3);
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out);
+  }
+  .iso-counter.iso-visible { opacity: 1; }
+  .iso-counter span { color: var(--ink); font-weight: 600; }
+
+  /* ── Caption ── */
+  .iso-caption {
+    margin-top: 48px; padding: 28px 32px;
+    background: var(--ink); color: var(--bg);
+    position: relative;
+    font-size: 20px; line-height: 1.4; font-weight: 400;
+  }
+  .iso-caption::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 6px; background: var(--accent);
+  }
+  .iso-caption em { color: var(--accent); font-weight: 500; font-style: normal; }
+  .iso-caption .iso-source {
+    display: block; margin-top: 12px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1.4px; color: rgba(255,255,255,0.5);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .iso-panels { grid-template-columns: 1fr; }
+    .iso-panel.iso-before { border-right: none; border-bottom: 1px solid var(--line-2); }
+    .iso-panel { padding: 32px 24px; min-height: 360px; }
+    .iso-grid { grid-template-columns: repeat(5, 1fr); }
+    .iso-counter { left: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="iso-wrapper">
+  <div class="iso-eyebrow">Capability surface area</div>
+  <h1 class="iso-title">Who Can Act Has <em>Expanded</em></h1>
+  <p class="iso-subtitle">Capability didn't just improve. It spread.</p>
+
+  <div class="iso-panels" id="isoPanels">
+    <!-- BEFORE panel -->
+    <div class="iso-panel iso-before">
+      <div class="iso-panel-label">Before</div>
+      <div class="iso-grid" id="isoBeforeGrid"></div>
+      <div class="iso-legend" id="isoBeforeLegend"></div>
+    </div>
+    <!-- NOW panel -->
+    <div class="iso-panel iso-now" id="isoNowPanel">
+      <div class="iso-panel-label">Now</div>
+      <div class="iso-grid" id="isoNowGrid"></div>
+      <div class="iso-legend" id="isoNowLegend"></div>
+      <div class="iso-counter" id="isoCounter"><span>0</span> / 30 roles with direct access</div>
+      <div class="iso-click-hint" id="isoClickHint">Click to animate</div>
+    </div>
+  </div>
+
+  <div class="iso-caption">
+    The shift isn't that experts got better. <em>It's that everyone else caught up.</em>
+    <span class="iso-source">&mdash; Leadership &times; AI, Capability Expansion</span>
+  </div>
+</div>
+
+<script>
+(function () {
+
+  /* ── Person icon SVG (inline) ── */
+  var ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 34" width="28" height="42">' +
+    '<circle cx="10" cy="7" r="5.5"/>' +
+    '<path d="M3.5 16 C3.5 14.5 5 13.5 10 13.5 C15 13.5 16.5 14.5 16.5 16 L16.5 27 C16.5 29 15 31 10 31 C5 31 3.5 29 3.5 27 Z"/>' +
+    '</svg>';
+
+  /* ── Grid configuration ── */
+  var COLS = 6;
+  var ROWS = 5;
+  var TOTAL = COLS * ROWS; // 30
+
+  /* Before panel: which icons are lit */
+  var beforeConfig = [];
+  for (var i = 0; i < TOTAL; i++) {
+    var row = Math.floor(i / COLS);
+    if (row === 0) {
+      beforeConfig.push('expert');      // Row 1: 6 Experts
+    } else if (row === 1 && i % COLS < 2) {
+      beforeConfig.push('manager');     // Row 2: 2 Managers
+    } else {
+      beforeConfig.push('ghost');       // Rest: ghost
+    }
+  }
+
+  /* Now panel: role assignment for animation (equal thirds) */
+  var nowConfig = [];
+  for (var j = 0; j < TOTAL; j++) {
+    if (j < 10)       nowConfig.push('expert');
+    else if (j < 20)  nowConfig.push('manager');
+    else              nowConfig.push('operator');
+  }
+
+  /* ── Build grid ── */
+  function buildGrid(containerId, config, isNowPanel) {
+    var container = document.getElementById(containerId);
+    for (var i = 0; i < config.length; i++) {
+      var fig = document.createElement('div');
+      fig.className = 'iso-figure';
+      fig.dataset.index = i;
+      fig.dataset.role = config[i];
+      fig.innerHTML = ICON_SVG;
+
+      if (isNowPanel) {
+        fig.classList.add('iso-ghost');
+        fig.querySelector('svg').style.fill = '#B0B0B0';
+      } else {
+        fig.classList.add('iso-' + config[i]);
+      }
+
+      container.appendChild(fig);
+    }
+  }
+
+  buildGrid('isoBeforeGrid', beforeConfig, false);
+  buildGrid('isoNowGrid', nowConfig, true);
+
+  /* ── Build legends ── */
+  function buildLegend(containerId, items) {
+    var container = document.getElementById(containerId);
+    items.forEach(function (item) {
+      var el = document.createElement('div');
+      el.className = 'iso-legend-item';
+      el.innerHTML =
+        '<div class="iso-legend-dot iso-dot-' + item.role + '"></div>' +
+        '<span class="iso-legend-name">' + item.name + '</span>' +
+        '<span class="iso-legend-tag">' + item.tag + '</span>';
+      container.appendChild(el);
+    });
+  }
+
+  buildLegend('isoBeforeLegend', [
+    { role: 'expert',  name: 'Experts',   tag: 'dominant' },
+    { role: 'manager', name: 'Managers',  tag: 'limited access' },
+    { role: 'ghost',   name: 'Operators', tag: 'minimal' }
+  ]);
+
+  buildLegend('isoNowLegend', [
+    { role: 'expert',   name: 'Experts',   tag: 'high' },
+    { role: 'manager',  name: 'Managers',  tag: 'high' },
+    { role: 'operator', name: 'Operators', tag: 'significantly expanded' }
+  ]);
+
+  /* ── Scroll reveal (IntersectionObserver) ── */
+  var revealed = false;
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting && !revealed) {
+        revealed = true;
+        revealBeforePanel();
+        revealNowGhosts();
+        setTimeout(function () {
+          document.getElementById('isoClickHint').classList.add('visible');
+        }, 800);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  observer.observe(document.getElementById('isoPanels'));
+
+  function revealBeforePanel() {
+    var figures = document.querySelectorAll('#isoBeforeGrid .iso-figure');
+    figures.forEach(function (fig, i) {
+      setTimeout(function () {
+        fig.classList.add('iso-visible');
+      }, i * 40);
+    });
+    // Legend
+    var legendItems = document.querySelectorAll('#isoBeforeLegend .iso-legend-item');
+    setTimeout(function () {
+      legendItems.forEach(function (item) { item.classList.add('iso-visible'); });
+    }, figures.length * 40 + 200);
+  }
+
+  function revealNowGhosts() {
+    var figures = document.querySelectorAll('#isoNowGrid .iso-figure');
+    figures.forEach(function (fig, i) {
+      setTimeout(function () {
+        fig.classList.add('iso-visible');
+      }, i * 30 + 200);
+    });
+  }
+
+  /* ── Click to animate (Now panel) ── */
+  var animated = false;
+  var nowPanel = document.getElementById('isoNowPanel');
+
+  nowPanel.addEventListener('click', function () {
+    if (animated) return;
+    animated = true;
+
+    var hint = document.getElementById('isoClickHint');
+    hint.classList.remove('visible');
+    hint.classList.add('hidden');
+
+    var figures = document.querySelectorAll('#isoNowGrid .iso-figure');
+    var counterEl = document.getElementById('isoCounter');
+    var counterSpan = counterEl.querySelector('span');
+    counterEl.classList.add('iso-visible');
+
+    var delay = 0;
+    var litCount = 0;
+
+    figures.forEach(function (fig, i) {
+      var role = fig.dataset.role;
+      var thisDelay = delay;
+
+      // Add a small pause between role groups
+      if (i === 10 || i === 20) {
+        delay += 180;
+        thisDelay = delay;
+      }
+
+      setTimeout(function () {
+        fig.classList.remove('iso-ghost');
+        fig.classList.add('iso-lit', 'iso-lit-' + role);
+
+        litCount++;
+        counterSpan.textContent = litCount;
+
+        // Highlight operators
+        if (role === 'operator') {
+          fig.classList.add('iso-highlight');
+        }
+      }, thisDelay);
+
+      delay += 70;
+    });
+
+    // Show legend after animation completes
+    var totalTime = delay + 100;
+    setTimeout(function () {
+      var legendItems = document.querySelectorAll('#isoNowLegend .iso-legend-item');
+      legendItems.forEach(function (item, i) {
+        setTimeout(function () { item.classList.add('iso-visible'); }, i * 120);
+      });
+    }, totalTime);
+  });
+
+})();
+</script>
+</body>
+</html>
